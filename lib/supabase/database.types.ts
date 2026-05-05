@@ -185,11 +185,17 @@ export type AdminProfile = {
  * Each table needs Row / Insert / Update / Relationships, and the schema
  * needs Views / Functions / Enums / CompositeTypes — otherwise the
  * GenericSchema constraint fails and every query collapses to `never`.
+ *
+ * The `& Record<string, unknown>` intersection is the key bit: Supabase's
+ * GenericTable constraint requires an index signature on Row/Insert/Update,
+ * which a plain object type does not have. The intersection adds it without
+ * widening the existing typed keys (Application.parent_name stays `string`,
+ * not `unknown`).
  */
 type Row<T> = {
-  Row: T;
-  Insert: Partial<T>;
-  Update: Partial<T>;
+  Row: T & Record<string, unknown>;
+  Insert: Partial<T> & Record<string, unknown>;
+  Update: Partial<T> & Record<string, unknown>;
   Relationships: [];
 };
 
