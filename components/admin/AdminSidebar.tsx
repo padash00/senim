@@ -9,7 +9,6 @@ import {
   Image as ImageIcon,
   Inbox,
   LayoutDashboard,
-  MessageSquare,
   Settings2,
   Sparkles,
   Star,
