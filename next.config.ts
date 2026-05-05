@@ -38,9 +38,9 @@ const config: NextConfig = {
     ],
     formats: ["image/avif", "image/webp"],
   },
-  experimental: {
-    typedRoutes: true,
-  },
+  // typedRoutes left disabled: forces every dynamic href into a `Route` cast,
+  // which is busywork for a marketing site. Re-enable once URL stability is
+  // worth the extra ergonomics tax.
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
