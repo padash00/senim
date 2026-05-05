@@ -13,8 +13,8 @@ const ALLOWED_HOST_RE = /^(?:[\w-]+\.)*(2gis\.kz|2gis\.com|2gis\.ru|google\.com|
 export function sanitizeIframe(html: string | null | undefined): string {
   if (!html) return "";
   const srcMatch = html.match(/src\s*=\s*["']([^"']+)["']/i);
-  if (!srcMatch) return "";
-  const src = srcMatch[1];
+  const src = srcMatch?.[1];
+  if (!src) return "";
 
   let url: URL;
   try {
