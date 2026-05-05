@@ -47,9 +47,10 @@ export function WhatsAppFloating({
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label}
+      data-floating-wa
       className={cn(
         "fixed bottom-5 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-success text-success-foreground shadow-card",
-        "transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+        "transition-all hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
       )}
     >
       <MessageCircle className="h-7 w-7" />

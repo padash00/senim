@@ -110,7 +110,7 @@ export function ApplicationForm({
   }
 
   return (
-    <Card className={className}>
+    <Card className={className} data-application-form>
       <CardHeader>
         <CardTitle>{t("title")}</CardTitle>
         <CardDescription>{t("subtitle")}</CardDescription>

@@ -172,3 +172,12 @@
   .float-soft { animation: float-soft 7s ease-in-out infinite; }
   .pulse-ring { animation: pulse-ring 2.4s ease-out infinite; }
 }
+
+/* Mobile: hide the floating WhatsApp bubble when an application form is on
+   the page — the form already has its own submit + WhatsApp buttons inline,
+   and the bubble would sit on top of them. Desktop keeps the bubble. */
+@media (max-width: 767px) {
+  body:has(main [data-application-form]) [data-floating-wa] {
+    display: none;
+  }
+}

@@ -263,12 +263,12 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             </p>
           </div>
 
-          <ul className="reveal mt-12 flex flex-wrap items-baseline gap-x-8 gap-y-3 font-display text-[2.5rem] font-semibold leading-[1.05] tracking-tight md:gap-x-10 md:text-[4rem] lg:text-[5rem]">
+          <ul className="reveal mt-12 flex flex-wrap items-baseline gap-x-5 gap-y-3 font-display text-[2rem] font-semibold leading-[1.05] tracking-tight sm:gap-x-8 sm:text-[2.5rem] md:gap-x-10 md:text-[4rem] lg:text-[5rem]">
             {COPY.audience.words[loc].map((w, i) => (
               <li key={w} className="group inline-flex items-baseline gap-3 transition-colors">
                 <span className="text-foreground transition-colors duration-300 group-hover:text-primary">{w}</span>
                 {i < COPY.audience.words[loc].length - 1 && (
-                  <span aria-hidden className="text-2xl text-accent-foreground/30 md:text-4xl">·</span>
+                  <span aria-hidden className="text-xl text-accent-foreground/30 sm:text-2xl md:text-4xl">·</span>
                 )}
               </li>
             ))}
