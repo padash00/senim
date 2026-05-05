@@ -9,14 +9,13 @@ import { Logo } from "./Logo";
 import { CTAButton } from "./CTAButton";
 import { cn } from "@/lib/utils";
 
+// Compressed nav: 4 entry points instead of 8. Keeps the header airy and
+// lets parents scan it in one glance. The other pages are reachable from the
+// footer and from CTA flows on each section.
 const NAV = [
-  { href: "/", key: "home" as const },
   { href: "/about", key: "about" as const },
   { href: "/services", key: "services" as const },
-  { href: "/specialists", key: "specialists" as const },
   { href: "/parents", key: "parents" as const },
-  { href: "/reviews", key: "reviews" as const },
-  { href: "/blog", key: "blog" as const },
   { href: "/contacts", key: "contacts" as const },
 ];
 
