@@ -37,7 +37,7 @@ export async function createService(_: ActionResult | undefined, fd: FormData): 
   } catch (e) {
     return { ok: false, error: (e as Error).message };
   }
-  if (!payload.slug) payload.slug = slugify(payload.title_kk ?? "service");
+  if (!payload.slug) payload.slug = slugify(s(fd, "title_kk") ?? "service");
 
   const { error } = await supabase.from("services").insert(payload);
   if (error) return { ok: false, error: error.message };

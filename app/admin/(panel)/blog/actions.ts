@@ -30,7 +30,9 @@ export async function createBlogPost(_: ActionResult | undefined, fd: FormData):
   const supabase = await createSupabaseServerClient();
   let payload;
   try { payload = buildPayload(fd); } catch (e) { return { ok: false, error: (e as Error).message }; }
-  if (!payload.slug) payload.slug = slugify(payload.title_kk ?? payload.title_ru ?? "post");
+  if (!payload.slug) {
+    payload.slug = slugify(s(fd, "title_kk") ?? s(fd, "title_ru") ?? "post");
+  }
   const { error } = await supabase.from("blog_posts").insert(payload);
   if (error) return { ok: false, error: error.message };
   bustTags(REVALIDATE_TAGS.blog);
