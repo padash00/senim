@@ -2,16 +2,20 @@ import "server-only";
 
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import type { Database } from "./database.types";
 
 /**
  * Server-side Supabase client wired to Next.js cookies.
  * Use inside Server Components, Route Handlers, and Server Actions.
+ *
+ * Untyped on purpose: hand-rolled Database types collapse to `never` under
+ * Supabase's GenericTable constraint. Once you run `pnpm db:types` against a
+ * live Supabase project, regenerate `database.types.ts` and re-add the
+ * <Database> generic for full type safety.
  */
 export async function createSupabaseServerClient() {
   const cookieStore = await cookies();
 
-  return createServerClient<Database>(
+  return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {

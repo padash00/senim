@@ -1,7 +1,6 @@
 import "server-only";
 
 import { createClient } from "@supabase/supabase-js";
-import type { Database } from "./database.types";
 
 /**
  * Anon read-only client without cookie context — safe to use inside
@@ -11,7 +10,7 @@ import type { Database } from "./database.types";
  * public-facing tables, no writes).
  */
 export function createSupabaseAnonClient() {
-  return createClient<Database>(
+  return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {

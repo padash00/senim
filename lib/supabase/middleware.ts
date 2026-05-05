@@ -1,13 +1,12 @@
 import { createServerClient } from "@supabase/ssr";
 import type { NextRequest, NextResponse } from "next/server";
-import type { Database } from "./database.types";
 
 /**
  * Refresh the Supabase auth session for incoming requests so that
  * Server Components see the current user. Call from middleware.ts.
  */
 export async function updateSupabaseSession(request: NextRequest, response: NextResponse) {
-  const supabase = createServerClient<Database>(
+  const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
