@@ -1,0 +1,94 @@
+"use client";
+
+import { useState } from "react";
+import { useTranslations } from "next-intl";
+import { Menu, X } from "lucide-react";
+import { Link, usePathname } from "@/lib/i18n/navigation";
+import { LanguageSwitcher } from "./LanguageSwitcher";
+import { Logo } from "./Logo";
+import { CTAButton } from "./CTAButton";
+import { cn } from "@/lib/utils";
+
+const NAV = [
+  { href: "/", key: "home" as const },
+  { href: "/about", key: "about" as const },
+  { href: "/services", key: "services" as const },
+  { href: "/specialists", key: "specialists" as const },
+  { href: "/parents", key: "parents" as const },
+  { href: "/reviews", key: "reviews" as const },
+  { href: "/blog", key: "blog" as const },
+  { href: "/contacts", key: "contacts" as const },
+];
+
+export function Header({ tagline }: { tagline?: string }) {
+  const t = useTranslations("nav");
+  const tCta = useTranslations("cta");
+  const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+
+  return (
+    <header className="sticky top-0 z-30 border-b border-border/60 bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70">
+      <div className="container flex h-16 items-center gap-4 lg:h-20">
+        <Link href="/" className="shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-full">
+          <Logo tagline={tagline} />
+        </Link>
+
+        <nav className="ml-6 hidden flex-1 items-center gap-1 lg:flex">
+          {NAV.map(({ href, key }) => {
+            const active = pathname === href || (href !== "/" && pathname.startsWith(href));
+            return (
+              <Link
+                key={href}
+                /* @ts-expect-error typed-routes */
+                href={href}
+                className={cn(
+                  "rounded-full px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground",
+                  active && "bg-secondary text-foreground",
+                )}
+              >
+                {t(key)}
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="ml-auto flex items-center gap-2">
+          <LanguageSwitcher />
+          <CTAButton href="/contacts#apply" size="sm" className="hidden md:inline-flex">
+            {tCta("apply")}
+          </CTAButton>
+          <button
+            type="button"
+            aria-label="Menu"
+            aria-expanded={open}
+            onClick={() => setOpen((v) => !v)}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border/70 bg-background lg:hidden"
+          >
+            {open ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+          </button>
+        </div>
+      </div>
+
+      {open && (
+        <div className="border-t border-border/60 bg-background/95 lg:hidden">
+          <nav className="container flex flex-col gap-1 py-4">
+            {NAV.map(({ href, key }) => (
+              <Link
+                key={href}
+                /* @ts-expect-error typed-routes */
+                href={href}
+                onClick={() => setOpen(false)}
+                className="rounded-xl px-3 py-2.5 text-base font-medium hover:bg-secondary"
+              >
+                {t(key)}
+              </Link>
+            ))}
+            <CTAButton href="/contacts#apply" className="mt-2 w-full justify-center">
+              {tCta("apply")}
+            </CTAButton>
+          </nav>
+        </div>
+      )}
+    </header>
+  );
+}

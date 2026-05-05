@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Calm, warm, medical-educational palette */
+    --background: 36 38% 97%;        /* milk */
+    --foreground: 215 28% 17%;       /* deep slate */
+
+    --card: 0 0% 100%;
+    --card-foreground: 215 28% 17%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 28% 17%;
+
+    --primary: 212 60% 45%;          /* warm blue */
+    --primary-foreground: 0 0% 100%;
+    --primary-soft: 212 70% 94%;
+
+    --secondary: 210 16% 95%;
+    --secondary-foreground: 215 28% 17%;
+
+    --muted: 210 20% 96%;
+    --muted-foreground: 215 16% 45%;
+
+    --accent: 28 78% 90%;             /* warm peach accent */
+    --accent-foreground: 24 50% 28%;
+
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 152 55% 38%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 36 90% 50%;
+    --warning-foreground: 36 90% 12%;
+
+    --border: 215 16% 90%;
+    --input: 215 16% 90%;
+    --ring: 212 60% 45%;
+
+    --radius: 1rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+    font-feature-settings: "ss01", "cv11";
+  }
+  ::selection {
+    background: hsl(var(--primary-soft));
+    color: hsl(var(--foreground));
+  }
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+}
+
+@layer components {
+  .skip-link {
+    @apply sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50
+           focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground;
+  }
+  .container-prose {
+    @apply container max-w-3xl;
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "site": {
+    "name": "Senim",
+    "tagline": "developmental support centre",
+    "city": "Shymkent"
+  },
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "services": "Services",
+    "specialists": "Specialists",
+    "parents": "For parents",
+    "reviews": "Reviews",
+    "blog": "Resources",
+    "contacts": "Contacts"
+  },
+  "cta": {
+    "apply": "Request a consultation",
+    "whatsapp": "Message on WhatsApp",
+    "more": "Learn more",
+    "callBack": "Call me back",
+    "send": "Send",
+    "back": "Back"
+  },
+  "form": {
+    "title": "Request a consultation",
+    "subtitle": "A specialist will get back to you within an hour during working hours.",
+    "parentName": "Parent name",
+    "phone": "Phone",
+    "childAge": "Child's age",
+    "comment": "What concerns you?",
+    "preferredContact": "Preferred contact",
+    "preferredContact.phone": "Phone call",
+    "preferredContact.whatsapp": "WhatsApp",
+    "preferredContact.telegram": "Telegram",
+    "preferredLanguage": "Preferred language",
+    "consent": "I agree to the processing of my personal data",
+    "success": "Thank you. We will reach out to you shortly.",
+    "successWhatsapp": "Message us on WhatsApp now",
+    "errors": {
+      "required": "Required field",
+      "phone": "Please enter a valid phone number",
+      "consent": "Consent is required to continue",
+      "generic": "Something went wrong. Please try again."
+    }
+  },
+  "common": {
+    "loading": "Loading…",
+    "empty": "Nothing here yet.",
+    "readMore": "Read more",
+    "address": "Address",
+    "phone": "Phone",
+    "workingHours": "Working hours",
+    "languageSwitcher": "Switch language"
+  },
+  "home": {
+    "hero": {
+      "title": "Senim — a developmental support centre for children and teenagers",
+      "subtitle": "We help children grow their speech, communication, attention, movement and independence in a calm, supportive environment."
+    },
+    "audience": {
+      "title": "Who we help",
+      "subtitle": "Every child is unique. We design each programme after the initial consultation."
+    },
+    "services": {
+      "title": "Our services",
+      "subtitle": "Sessions are delivered one-to-one and in small groups."
+    },
+    "process": {
+      "title": "How we work"
+    },
+    "trust": {
+      "title": "Why families trust us"
+    },
+    "team": {
+      "title": "Specialists"
+    },
+    "reviews": {
+      "title": "What parents say"
+    }
+  },
+  "consultation": {
+    "title": "Initial consultation",
+    "body": "The programme and cost are defined after the initial consultation and observation. It is a calm conversation in which we get to know the child, agree on goals and pick a comfortable schedule."
+  },
+  "disclaimer": "The information on this site is for general guidance and does not replace medical advice or a specialist's diagnosis.",
+  "footer": {
+    "rights": "All rights reserved."
+  }
+}
