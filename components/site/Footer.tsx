@@ -74,7 +74,7 @@ export function Footer({ locale, contacts, tagline }: Props) {
             {t("nav.services")}
           </h3>
           <ul className="space-y-2 text-sm">
-            {(["about", "services", "specialists", "parents", "reviews", "blog"] as const).map((key) => (
+            {(["about", "services", "parents", "contacts"] as const).map((key) => (
               <li key={key}>
                 <Link
                   href={`/${key}`}

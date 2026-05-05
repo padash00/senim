@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Briefcase, Inbox, Star, Users2 } from "lucide-react";
+import { Award, Briefcase, Inbox, Users2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/admin/PageHeader";
@@ -10,11 +10,11 @@ export const dynamic = "force-dynamic";
 
 async function getStats() {
   const supabase = await createSupabaseServerClient();
-  const [apps, services, specialists, reviews, recentApps] = await Promise.all([
+  const [apps, services, specialists, certificates, recentApps] = await Promise.all([
     supabase.from("applications").select("id, status", { count: "exact", head: false }),
     supabase.from("services").select("id", { count: "exact", head: true }),
     supabase.from("specialists").select("id", { count: "exact", head: true }),
-    supabase.from("reviews").select("id", { count: "exact", head: true }),
+    supabase.from("certificates").select("id", { count: "exact", head: true }),
     supabase
       .from("applications")
       .select("id, parent_name, phone, status, created_at")
@@ -22,13 +22,13 @@ async function getStats() {
       .limit(5),
   ]);
 
-  const newCount = (apps.data ?? []).filter((a) => a.status === "new").length;
+  const newCount = (apps.data ?? []).filter((a: { status: string }) => a.status === "new").length;
   return {
     applicationsTotal: apps.count ?? 0,
     applicationsNew: newCount,
     servicesTotal: services.count ?? 0,
     specialistsTotal: specialists.count ?? 0,
-    reviewsTotal: reviews.count ?? 0,
+    certificatesTotal: certificates.count ?? 0,
     recent: recentApps.data ?? [],
   };
 }
@@ -44,7 +44,7 @@ export default async function AdminDashboard() {
         <Stat icon={Inbox} label="Заявок всего" value={s.applicationsTotal} hint={`${s.applicationsNew} новых`} accent={s.applicationsNew > 0} />
         <Stat icon={Briefcase} label="Услуги" value={s.servicesTotal} />
         <Stat icon={Users2} label="Специалисты" value={s.specialistsTotal} />
-        <Stat icon={Star} label="Отзывы" value={s.reviewsTotal} />
+        <Stat icon={Award} label="Сертификаты" value={s.certificatesTotal} />
       </div>
 
       <Card className="mt-8">
@@ -89,7 +89,7 @@ export default async function AdminDashboard() {
       <div className="mt-8 grid gap-4 md:grid-cols-3">
         <QuickAction href="/admin/services/new" title="Добавить услугу" />
         <QuickAction href="/admin/specialists/new" title="Добавить специалиста" />
-        <QuickAction href="/admin/blog/new" title="Новая статья" />
+        <QuickAction href="/admin/homepage" title="Редактировать главную" />
       </div>
     </div>
   );

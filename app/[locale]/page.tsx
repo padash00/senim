@@ -1,32 +1,15 @@
 import { setRequestLocale, getTranslations } from "next-intl/server";
-import {
-  Activity,
-  Brain,
-  GraduationCap,
-  Heart,
-  MessageCircle,
-  Shield,
-  Sparkles,
-  Users2,
-  Waves,
-  type LucideIcon,
-} from "lucide-react";
+import { ArrowDown, ArrowUpRight, Heart, ShieldCheck, Users2 } from "lucide-react";
 import type { Metadata } from "next";
 import { Container } from "@/components/site/Container";
-import { Section } from "@/components/site/Section";
-import { SectionTitle } from "@/components/site/SectionTitle";
 import { CTAButton } from "@/components/site/CTAButton";
 import { WhatsAppButton } from "@/components/site/WhatsAppButton";
 import { ServiceCard } from "@/components/site/ServiceCard";
-import { SpecialistCard } from "@/components/site/SpecialistCard";
-import { ReviewCard } from "@/components/site/ReviewCard";
 import { ApplicationForm } from "@/components/site/ApplicationForm";
 import { JsonLd } from "@/components/site/JsonLd";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   getContacts,
   getHomepageSections,
-  listReviews,
   listServices,
   listSpecialists,
 } from "@/lib/db/queries";
@@ -40,159 +23,225 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return buildMetadata({ path: "/", locale: locale as Locale });
 }
 
-const AUDIENCE: { icon: LucideIcon; key: string; titleKk: string; titleRu: string; titleEn: string }[] = [
-  { icon: MessageCircle, key: "speech", titleKk: "Сөйлеу", titleRu: "Речь", titleEn: "Speech" },
-  { icon: Brain, key: "attention", titleKk: "Зейін", titleRu: "Внимание", titleEn: "Attention" },
-  { icon: Users2, key: "communication", titleKk: "Қарым-қатынас", titleRu: "Коммуникация", titleEn: "Communication" },
-  { icon: Activity, key: "motor", titleKk: "Қозғалыс", titleRu: "Моторика", titleEn: "Motor skills" },
-  { icon: Waves, key: "sensory", titleKk: "Сенсорика", titleRu: "Сенсорика", titleEn: "Sensory" },
-  { icon: Sparkles, key: "behavior", titleKk: "Мінез-құлық", titleRu: "Поведение", titleEn: "Behaviour" },
-  { icon: GraduationCap, key: "learning", titleKk: "Оқу", titleRu: "Обучение", titleEn: "Learning" },
-  { icon: Heart, key: "self_help", titleKk: "Дербестік", titleRu: "Самостоятельность", titleEn: "Independence" },
-];
+/* ────────────────────────────────────────────────────────────────
+ * Editorial copy. Each block speaks to a parent who is tired of
+ * looking, feels alone, and needs a calm voice on the other end.
+ * ──────────────────────────────────────────────────────────────── */
 
-const PROCESS = [
-  { kk: "Бастапқы консультация", ru: "Первичная консультация", en: "Initial consultation" },
-  { kk: "Диагностика және бақылау", ru: "Диагностика и наблюдение", en: "Assessment and observation" },
-  { kk: "Жеке бағдарлама", ru: "Индивидуальная программа", en: "Individual programme" },
-  { kk: "Жүйелі сабақтар", ru: "Регулярные занятия", en: "Regular sessions" },
-  { kk: "Прогресті бақылау", ru: "Отслеживание прогресса", en: "Progress tracking" },
-  { kk: "Ата-анаға ұсыныстар", ru: "Рекомендации родителям", en: "Parent recommendations" },
-];
-
-// Re-written for emotional warmth — speaks directly to the parent.
-const HERO_COPY = {
-  badge: { kk: "Шымкент · Бейбітшілік 14/1", ru: "Шымкент · Бейбитшилик 14/1", en: "Shymkent · Beybitshilik 14/1" },
-  headline: {
-    kk: "Сіздің балаңыз — біздің ең басты жұмысымыз",
-    ru: "Ваш ребёнок — наша самая важная работа",
-    en: "Your child is our most important work",
+const COPY = {
+  hero: {
+    eyebrow: { kk: "Шымкент · Бейбітшілік 14/1", ru: "Шымкент · Бейбитшилик 14/1", en: "Shymkent · Beybitshilik 14/1" },
+    pretitle: { kk: "Сенім орталығы", ru: "Центр Сенім", en: "Senim centre" },
+    line1: { kk: "Сіздің балаңыз —", ru: "Ваш ребёнок —", en: "Your child is" },
+    line2: { kk: "біздің ең басты", ru: "наша самая", en: "our most" },
+    line3: { kk: "жұмысымыз.", ru: "важная работа.", en: "important work." },
+    sub: {
+      kk: "Сөйлеу. Зейін. Эмоциялар. Қарым-қатынас. Әр баланың жолы өзіндік. Біз сол жолды жанұямен бірге жайбарақат, нақты қадамдармен жүреміз.",
+      ru: "Речь. Внимание. Эмоции. Общение. У каждого ребёнка свой путь. Мы проходим его вместе с семьёй — спокойно, понятными шагами.",
+      en: "Speech. Attention. Emotions. Connection. Every child's path is unique. We walk it with the family — calmly, in clear steps.",
+    },
+    reassure: {
+      kk: "Алғашқы консультация — бұл диагноз емес. Бұл бастапқы әңгіме.",
+      ru: "Первая встреча — не диагноз. Это просто разговор.",
+      en: "The first meeting isn't a diagnosis. It's just a conversation.",
+    },
   },
-  sub: {
-    kk: "Сөйлеу, зейін, эмоциялар, қарым-қатынас — әр баланың жолы өзіндік. Біз жанұямен бірге сол жолды жайбарақат, нақты қадамдармен жүреміз.",
-    ru: "Речь, внимание, эмоции, общение — у каждого ребёнка свой путь. Мы проходим его вместе с семьёй — спокойно, понятными шагами.",
-    en: "Speech, attention, emotions, connection — every child's path is unique. We walk it with the family in calm, clear steps.",
+  trust: [
+    {
+      icon: Heart,
+      label: { kk: "Жеке тәсіл", ru: "Индивидуально", en: "One-to-one" },
+      sub: { kk: "Әр балаға өз бағдарламасы", ru: "Своя программа каждому ребёнку", en: "Custom programme per child" },
+    },
+    {
+      icon: Users2,
+      label: { kk: "Команда мамандар", ru: "Команда специалистов", en: "Team of specialists" },
+      sub: { kk: "Логопед · Дефектолог · ABA · Нейропсихолог", ru: "Логопед · Дефектолог · ABA · Нейропсихолог", en: "Speech · Special-needs · ABA · Neuropsychology" },
+    },
+    {
+      icon: ShieldCheck,
+      label: { kk: "Жайбарақат орта", ru: "Спокойная среда", en: "Calm environment" },
+      sub: { kk: "Балаға таныс және қауіпсіз", ru: "Знакомая и безопасная для ребёнка", en: "Familiar and safe for the child" },
+    },
+  ],
+  audience: {
+    eyebrow: { kk: "Біз көмектесеміз", ru: "Мы помогаем", en: "We help" },
+    headline: {
+      kk: "Бала дамуының барлық саласында:",
+      ru: "Во всех сферах развития ребёнка:",
+      en: "Across every area of a child's growth:",
+    },
+    words: {
+      kk: ["Сөйлеу", "Зейін", "Қарым-қатынас", "Қозғалыс", "Сенсорика", "Мінез-құлық", "Оқу", "Дербестік"],
+      ru: ["Речь", "Внимание", "Коммуникация", "Моторика", "Сенсорика", "Поведение", "Обучение", "Самостоятельность"],
+      en: ["Speech", "Attention", "Communication", "Motor skills", "Sensory", "Behaviour", "Learning", "Independence"],
+    },
+    note: {
+      kk: "Әр балаға — өз жолы. Бағдарлама бастапқы консультациядан кейін қалыптасады.",
+      ru: "Каждому ребёнку — свой путь. Программу подбираем после первичной консультации.",
+      en: "Every child has their own path. We design the programme after the first consultation.",
+    },
   },
-  reassure: {
-    kk: "Алғашқы консультация — бұл диагноз емес. Бұл бастапқы әңгіме.",
-    ru: "Первая встреча — не диагноз. Это просто разговор, с которого всё начинается.",
-    en: "The first meeting isn't a diagnosis. It's the conversation everything starts with.",
+  stats: [
+    {
+      number: "8+",
+      label: { kk: "жыл тәжірибе", ru: "лет опыта", en: "years of practice" },
+    },
+    {
+      number: "11",
+      label: { kk: "бағдарлама бағыты", ru: "программ и направлений", en: "programmes & directions" },
+    },
+    {
+      number: "3",
+      label: { kk: "тілде жұмыс істейміз", ru: "языка работы с семьёй", en: "languages we work in" },
+    },
+  ],
+  services: {
+    eyebrow: { kk: "Қызметтер", ru: "Услуги", en: "Services" },
+    headline: { kk: "Бағдарламалар", ru: "Программы", en: "Programmes" },
+    sub: {
+      kk: "Жеке және шағын топтық сабақтар. Маман таңдау бастапқы консультациядан кейін.",
+      ru: "Индивидуальные и малогрупповые занятия. Специалист подбирается после первичной консультации.",
+      en: "One-to-one and small-group sessions. The specialist is matched after the first consultation.",
+    },
+  },
+  process: {
+    eyebrow: { kk: "Жұмыс қалай жүреді", ru: "Как проходит работа", en: "How we work" },
+    headline: { kk: "Алты қадам — алаңдаушылықсыз", ru: "Шесть шагов без тревоги", en: "Six steps, without stress" },
+    steps: [
+      { kk: "Бастапқы консультация", ru: "Первичная консультация", en: "Initial consultation" },
+      { kk: "Диагностика және бақылау", ru: "Диагностика и наблюдение", en: "Assessment and observation" },
+      { kk: "Жеке бағдарлама", ru: "Индивидуальная программа", en: "Individual programme" },
+      { kk: "Жүйелі сабақтар", ru: "Регулярные занятия", en: "Regular sessions" },
+      { kk: "Прогресті бақылау", ru: "Отслеживание прогресса", en: "Progress tracking" },
+      { kk: "Ата-анаға ұсыныстар", ru: "Рекомендации родителям", en: "Parent recommendations" },
+    ],
+    stepDesc: [
+      { kk: "Танысамыз, балаңыз туралы әңгімелесеміз. Қысым жоқ.", ru: "Знакомимся, говорим о ребёнке. Никакого давления.", en: "We meet, we talk about your child. No pressure." },
+      { kk: "Маман баланы бақылайды, мақсаттарды нақтылайды.", ru: "Специалист наблюдает за ребёнком и формулирует цели.", en: "The specialist observes the child and shapes the goals." },
+      { kk: "Сізге түсінікті бағдарлама ұсынамыз.", ru: "Предлагаем понятную программу.", en: "We propose a programme you can follow." },
+      { kk: "Балаға ыңғайлы кестеде сабақтарды бастаймыз.", ru: "Начинаем занятия в комфортном для ребёнка ритме.", en: "Sessions begin at a pace that suits the child." },
+      { kk: "Әр айдағы өзгерістерді бірге көреміз.", ru: "Каждый месяц вместе видим изменения.", en: "Every month we see the changes together." },
+      { kk: "Үйде не істеуге болатыны туралы кеңес береміз.", ru: "Подсказываем, что делать дома.", en: "We share what helps at home." },
+    ],
+  },
+  philosophy: {
+    quote: {
+      kk: "Біз балаларды «емдемейміз». Біз олардың дамуына көмектесеміз. Әрбір бала — жол. Әрбір отбасы — команда.",
+      ru: "Мы не «лечим» детей. Мы помогаем им расти. Каждый ребёнок — путь. Каждая семья — команда.",
+      en: "We don't \"treat\" children. We help them grow. Every child is a path. Every family is a team.",
+    },
+    sign: { kk: "— Сенім орталығы", ru: "— Центр Сенім", en: "— Senim centre" },
+  },
+  finalCta: {
+    headline: {
+      kk: "Бір қоңыраудан бастаңыз.",
+      ru: "Начните с одного звонка.",
+      en: "Start with one call.",
+    },
+    sub: {
+      kk: "Жұмыс күндері 1 сағат ішінде хабарласамыз. Бағдарлама мен баға бастапқы консультациядан кейін айқындалады.",
+      ru: "Свяжемся в течение часа в рабочее время. Программа и стоимость определяются после первичной консультации.",
+      en: "We respond within an hour during working hours. Programme and price are agreed after the initial consultation.",
+    },
   },
 };
-
-const TRUST_BAR = [
-  {
-    icon: Heart,
-    kk: "Жеке тәсіл",
-    ru: "Индивидуально",
-    en: "One-to-one",
-    sub: { kk: "Әр балаға өз бағдарламасы", ru: "Своя программа каждому ребёнку", en: "Custom programme per child" },
-  },
-  {
-    icon: Users2,
-    kk: "Команда мамандар",
-    ru: "Команда специалистов",
-    en: "Team of specialists",
-    sub: { kk: "Логопед, дефектолог, ABA, нейропсихолог", ru: "Логопед, дефектолог, ABA, нейропсихолог", en: "Speech, special-needs, ABA, neuropsychology" },
-  },
-  {
-    icon: Shield,
-    kk: "Жайбарақат орта",
-    ru: "Спокойная среда",
-    en: "Calm environment",
-    sub: { kk: "Балаға таныс және қауіпсіз", ru: "Знакомая и безопасная для ребёнка", en: "Familiar and safe for the child" },
-  },
-];
-
-const TRUST = [
-  { kk: "Жеке тәсіл", ru: "Индивидуальный подход", en: "Individual approach" },
-  { kk: "Мамандар командасы", ru: "Команда специалистов", en: "Team of specialists" },
-  { kk: "Жайбарақат орта", ru: "Спокойная среда", en: "Calm environment" },
-  { kk: "Ата-анамен жұмыс", ru: "Работа с родителями", en: "Parent partnership" },
-  { kk: "Өмірлік дағдылар", ru: "Развитие жизненных навыков", en: "Life-skill development" },
-];
 
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const loc = locale as Locale;
 
-  const [tHome, tCta, tCommon, sections, services, specialists, reviews, contacts] = await Promise.all([
-    getTranslations("home"),
+  const [tCta, sections, services, specialists, contacts] = await Promise.all([
     getTranslations("cta"),
-    getTranslations("consultation"),
     getHomepageSections(),
     listServices(),
     listSpecialists(),
-    listReviews(),
     getContacts(),
   ]);
 
   const heroDb = sections.find((s) => s.key === "hero");
-  const audienceDb = sections.find((s) => s.key === "audience");
-  const processDb = sections.find((s) => s.key === "process");
-  const trustDb = sections.find((s) => s.key === "trust");
-  const consultDb = sections.find((s) => s.key === "consultation");
-  const loc = locale as Locale;
   const whatsapp = contacts?.whatsapp || env.NEXT_PUBLIC_WHATSAPP_NUMBER;
 
-  const heroTitle = tField(heroDb, "title", loc) || HERO_COPY.headline[loc];
-  const heroSub = tField(heroDb, "subtitle", loc) || HERO_COPY.sub[loc];
+  // Stat numbers — let admin override "11" if they edit homepage_sections.
+  const stats = [...COPY.stats];
+  stats[1] = { ...stats[1], number: String(services.length || 11) };
+
+  // CMS overrides for hero (admin can rewrite headline / subtitle from /admin/homepage)
+  const heroOverrideTitle = tField(heroDb, "title", loc);
+  const heroOverrideSub = tField(heroDb, "subtitle", loc);
 
   return (
     <main id="main">
       <JsonLd contacts={contacts} locale={loc} />
 
-      {/* HERO ============================================================ */}
-      <section className="relative overflow-hidden pb-24 pt-10 md:pt-20 lg:pt-28">
-        {/* Warm, soft background — not a flat color, not a gradient blob storm. */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[640px] bg-gradient-to-b from-accent/20 via-background to-background" />
-        <div className="pointer-events-none absolute -right-40 -top-32 -z-10 h-[28rem] w-[28rem] rounded-full bg-accent/40 blur-3xl float-soft" />
-        <div className="pointer-events-none absolute -left-32 top-56 -z-10 h-[22rem] w-[22rem] rounded-full bg-primary-soft/70 blur-3xl float-soft" style={{ animationDelay: "-3s" }} />
+      {/* ═══════════════ HERO — editorial, full-bleed ═══════════════ */}
+      <section className="relative overflow-hidden">
+        {/* Soft warm glow background */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[820px] bg-gradient-to-b from-accent/30 via-background to-background" />
+        <div className="pointer-events-none absolute -right-32 -top-20 -z-10 h-[36rem] w-[36rem] rounded-full bg-accent/40 blur-3xl float-soft" />
+        <div className="pointer-events-none absolute -left-32 top-72 -z-10 h-[24rem] w-[24rem] rounded-full bg-primary-soft/60 blur-3xl float-soft" style={{ animationDelay: "-3s" }} />
 
-        <Container className="relative grid items-center gap-14 lg:grid-cols-[1.15fr_1fr]">
-          <div className="reveal space-y-7">
-            <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/80 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground backdrop-blur">
-              <span className="relative inline-flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full rounded-full bg-success/60 pulse-ring" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
-              </span>
-              {HERO_COPY.badge[loc]}
-            </div>
-
-            <h1 className="font-display text-[2.6rem] font-semibold leading-[1.05] tracking-tight text-foreground md:text-5xl lg:text-[3.8rem]">
-              {heroTitle}
-            </h1>
-
-            <p className="max-w-xl text-lg leading-relaxed text-muted-foreground md:text-xl">{heroSub}</p>
-
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <CTAButton href="/contacts#apply" size="lg" showArrow>
-                {tCta("apply")}
-              </CTAButton>
-              <WhatsAppButton phone={whatsapp} label={tCta("whatsapp")} variant="outline" size="lg" />
-            </div>
-
-            <p className="max-w-md text-sm leading-relaxed text-muted-foreground/90">
-              <span aria-hidden className="mr-1.5 inline-block h-1 w-1 rounded-full bg-accent-foreground/50 align-middle" />
-              {HERO_COPY.reassure[loc]}
-            </p>
+        <Container className="relative pt-12 md:pt-20 lg:pt-28">
+          <div className="reveal flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+            <span className="relative inline-flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full rounded-full bg-success/60 pulse-ring" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
+            </span>
+            {COPY.hero.eyebrow[loc]}
+            <span className="ml-auto hidden text-muted-foreground/60 md:inline">{COPY.hero.pretitle[loc]} · 2026</span>
           </div>
 
-          <HeroIllustration loc={loc} />
-        </Container>
+          {heroOverrideTitle ? (
+            <h1 className="reveal mt-12 max-w-[18ch] font-display text-[2.8rem] font-semibold leading-[1.02] tracking-tight md:text-[5rem] lg:text-[6.5rem]">
+              {heroOverrideTitle}
+            </h1>
+          ) : (
+            <h1 className="reveal mt-12 font-display text-[2.8rem] font-semibold leading-[1.02] tracking-tight md:text-[5rem] lg:text-[6.5rem]">
+              <span className="block">{COPY.hero.line1[loc]}</span>
+              <span className="block text-muted-foreground/55">{COPY.hero.line2[loc]}</span>
+              <span className="block">{COPY.hero.line3[loc]}</span>
+            </h1>
+          )}
 
-        {/* TRUST BAR — appears immediately under the fold so the parent
-            sees three concrete reassurances within the first scroll. */}
-        <Container className="reveal mt-16 lg:mt-20">
-          <div className="grid gap-3 rounded-3xl border border-border/60 bg-card p-3 shadow-soft sm:grid-cols-3 sm:gap-0 sm:divide-x sm:divide-border/60 sm:p-0">
-            {TRUST_BAR.map(({ icon: Icon, sub, ...labels }, i) => (
-              <div key={i} className="flex items-start gap-4 p-5">
+          <div className="reveal mt-12 grid gap-10 lg:mt-16 lg:grid-cols-[2fr_1fr] lg:items-end">
+            <p className="max-w-2xl text-lg leading-relaxed text-muted-foreground md:text-xl">
+              {heroOverrideSub || COPY.hero.sub[loc]}
+            </p>
+
+            <div className="flex flex-col items-start gap-4 lg:items-end">
+              <div className="flex flex-wrap items-center gap-3">
+                <CTAButton href="/contacts#apply" size="lg" showArrow>
+                  {tCta("apply")}
+                </CTAButton>
+                <WhatsAppButton phone={whatsapp} label={tCta("whatsapp")} variant="outline" size="lg" />
+              </div>
+              <p className="max-w-xs text-sm leading-snug text-muted-foreground/85 lg:text-right">
+                {COPY.hero.reassure[loc]}
+              </p>
+            </div>
+          </div>
+
+          {/* Scroll cue */}
+          <div className="reveal mt-20 flex items-center gap-3 text-xs uppercase tracking-[0.18em] text-muted-foreground/60">
+            <span className="h-px w-12 bg-border" />
+            <ArrowDown className="h-3.5 w-3.5 animate-bounce" />
+            <span>{loc === "kk" ? "Төмен қарай" : loc === "en" ? "Scroll" : "Скролл"}</span>
+          </div>
+        </Container>
+      </section>
+
+      {/* ═══════════════ TRUST BAR ═══════════════ */}
+      <section className="border-y border-border/50 bg-card">
+        <Container>
+          <div className="reveal-stagger grid gap-0 sm:grid-cols-3 sm:divide-x sm:divide-border/50">
+            {COPY.trust.map(({ icon: Icon, label, sub }, i) => (
+              <div key={i} className="flex items-start gap-4 py-7 sm:px-7 sm:first:pl-0 sm:last:pr-0">
                 <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-accent text-accent-foreground">
                   <Icon className="h-5 w-5" />
                 </span>
-                <div className="space-y-0.5">
-                  <p className="font-display text-sm font-semibold">{labels[loc]}</p>
-                  <p className="text-xs leading-snug text-muted-foreground">{sub[loc]}</p>
+                <div className="space-y-1">
+                  <p className="font-display text-base font-semibold leading-tight">{label[loc]}</p>
+                  <p className="text-sm leading-snug text-muted-foreground">{sub[loc]}</p>
                 </div>
               </div>
             ))}
@@ -200,213 +249,173 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         </Container>
       </section>
 
-      {/* AUDIENCE ======================================================== */}
-      <Section>
+      {/* ═══════════════ AUDIENCE — big-type manifesto ═══════════════ */}
+      <section className="py-28 md:py-36">
         <Container>
-          <div className="reveal">
-            <SectionTitle
-              eyebrow={tHome("audience.title")}
-              title={tField(audienceDb, "title", loc) || tHome("audience.title")}
-              subtitle={tField(audienceDb, "subtitle", loc) || tHome("audience.subtitle")}
-            />
+          <div className="reveal max-w-2xl space-y-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+              {COPY.audience.eyebrow[loc]}
+            </p>
+            <p className="font-display text-2xl font-medium leading-snug text-muted-foreground md:text-3xl">
+              {COPY.audience.headline[loc]}
+            </p>
           </div>
-          <ul className="reveal-stagger mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-            {AUDIENCE.map(({ icon: Icon, key, ...labels }) => (
-              <li key={key}>
-                <Card className="lift h-full">
-                  <CardContent className="flex flex-col items-start gap-3 p-5">
-                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-primary-soft text-primary">
-                      <Icon className="h-5 w-5" />
-                    </span>
-                    <p className="text-sm font-medium">{labels[`title${cap(loc)}` as keyof typeof labels]}</p>
-                  </CardContent>
-                </Card>
+
+          <ul className="reveal mt-12 flex flex-wrap items-baseline gap-x-8 gap-y-3 font-display text-[2.5rem] font-semibold leading-[1.05] tracking-tight md:gap-x-10 md:text-[4rem] lg:text-[5rem]">
+            {COPY.audience.words[loc].map((w, i) => (
+              <li key={w} className="group inline-flex items-baseline gap-3 transition-colors">
+                <span className="text-foreground transition-colors duration-300 group-hover:text-primary">{w}</span>
+                {i < COPY.audience.words[loc].length - 1 && (
+                  <span aria-hidden className="text-2xl text-accent-foreground/30 md:text-4xl">·</span>
+                )}
               </li>
             ))}
           </ul>
-        </Container>
-      </Section>
 
-      {/* SERVICES ======================================================== */}
-      <Section bleed="muted">
+          <p className="reveal mt-14 max-w-xl text-base leading-relaxed text-muted-foreground">
+            {COPY.audience.note[loc]}
+          </p>
+        </Container>
+      </section>
+
+      {/* ═══════════════ STATS — quietly confident numbers ═══════════════ */}
+      <section className="border-y border-border/50 bg-primary-soft/30 py-20 md:py-24">
+        <Container>
+          <div className="reveal-stagger grid gap-10 md:grid-cols-3 md:gap-6">
+            {stats.map((s, i) => (
+              <div key={i} className="flex flex-col items-start gap-2">
+                <span className="font-display text-7xl font-semibold leading-none tracking-tight text-primary md:text-8xl">
+                  {s.number}
+                </span>
+                <span className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+                  {s.label[loc]}
+                </span>
+              </div>
+            ))}
+          </div>
+        </Container>
+      </section>
+
+      {/* ═══════════════ SERVICES — asymmetric grid ═══════════════ */}
+      <section className="py-28 md:py-36">
         <Container>
           <div className="reveal flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
-            <SectionTitle
-              eyebrow={tHome("services.title")}
-              title={tHome("services.title")}
-              subtitle={tHome("services.subtitle")}
-            />
+            <div className="max-w-xl space-y-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+                {COPY.services.eyebrow[loc]}
+              </p>
+              <h2 className="font-display text-4xl font-semibold leading-tight tracking-tight md:text-5xl">
+                {COPY.services.headline[loc]}
+              </h2>
+              <p className="text-base leading-relaxed text-muted-foreground">{COPY.services.sub[loc]}</p>
+            </div>
             <CTAButton href="/services" variant="outline" size="sm" showArrow>
               {tCta("more")}
             </CTAButton>
           </div>
-          <div className="reveal-stagger mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {services.slice(0, 6).map((s) => (
-              <div key={s.id} className="lift">
+
+          {/* Asymmetric grid: first card spans 2x2, others are 1x1 → cinematic 3-column rhythm */}
+          <div className="reveal-stagger mt-12 grid gap-4 md:grid-cols-3 md:grid-rows-2">
+            {services.slice(0, 6).map((s, i) => (
+              <div
+                key={s.id}
+                className={
+                  "lift " +
+                  (i === 0 ? "md:col-span-2 md:row-span-2" : "")
+                }
+              >
                 <ServiceCard service={s} locale={loc} />
               </div>
             ))}
           </div>
         </Container>
-      </Section>
+      </section>
 
-      {/* PROCESS ========================================================= */}
-      <Section>
+      {/* ═══════════════ PROCESS — vertical timeline ═══════════════ */}
+      <section className="bg-secondary/40 py-28 md:py-36">
         <Container>
-          <div className="reveal">
-            <SectionTitle
-              eyebrow={tHome("process.title")}
-              title={tField(processDb, "title", loc) || tHome("process.title")}
-            />
-          </div>
-          <ol className="reveal-stagger mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {PROCESS.map((step, i) => (
-              <li key={i}>
-                <Card className="lift h-full">
-                  <CardContent className="flex h-full items-start gap-4 p-6">
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
-                      {i + 1}
-                    </span>
-                    <p className="text-base font-medium leading-snug">{step[loc]}</p>
-                  </CardContent>
-                </Card>
-              </li>
-            ))}
-          </ol>
-        </Container>
-      </Section>
+          <div className="reveal grid gap-10 lg:grid-cols-[1fr_2fr] lg:items-start">
+            <div className="space-y-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+                {COPY.process.eyebrow[loc]}
+              </p>
+              <h2 className="font-display text-4xl font-semibold leading-tight tracking-tight md:text-5xl">
+                {COPY.process.headline[loc]}
+              </h2>
+            </div>
 
-      {/* TRUST =========================================================== */}
-      <Section bleed="primary-soft">
-        <Container>
-          <div className="reveal">
-            <SectionTitle
-              align="center"
-              eyebrow={tHome("trust.title")}
-              title={tField(trustDb, "title", loc) || tHome("trust.title")}
-            />
-          </div>
-          <div className="reveal-stagger mx-auto mt-12 grid max-w-5xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {TRUST.map((item, i) => (
-              <Card key={i} className="lift">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3">
-                    <span className="h-2 w-2 rounded-full bg-primary" />
-                    <p className="font-medium">{item[loc]}</p>
+            <ol className="reveal-stagger relative space-y-3 border-l border-dashed border-border/80 pl-8 lg:pl-12">
+              {COPY.process.steps.map((step, i) => (
+                <li key={i} className="relative">
+                  <span className="absolute -left-[2.6rem] top-2 inline-flex h-7 w-7 items-center justify-center rounded-full border border-border/70 bg-background font-mono text-[11px] font-semibold text-primary lg:-left-[3.4rem] lg:h-9 lg:w-9 lg:text-xs">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <div className="rounded-2xl bg-card px-6 py-5 shadow-soft lift">
+                    <p className="font-display text-lg font-semibold leading-tight">{step[loc]}</p>
+                    <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                      {COPY.process.stepDesc[i]?.[loc]}
+                    </p>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
+                </li>
+              ))}
+            </ol>
           </div>
         </Container>
-      </Section>
+      </section>
 
-      {/* SPECIALISTS ===================================================== */}
-      {specialists.length > 0 && (
-        <Section>
-          <Container>
-            <div className="reveal flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
-              <SectionTitle eyebrow={tHome("team.title")} title={tHome("team.title")} />
-              <CTAButton href="/specialists" variant="outline" size="sm" showArrow>
-                {tCta("more")}
-              </CTAButton>
-            </div>
-            <div className="reveal-stagger mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {specialists.slice(0, 3).map((sp) => (
-                <div key={sp.id} className="lift">
-                  <SpecialistCard specialist={sp} locale={loc} />
-                </div>
-              ))}
-            </div>
-          </Container>
-        </Section>
-      )}
+      {/* ═══════════════ PHILOSOPHY — single quote, full-bleed ═══════════════ */}
+      <section className="relative overflow-hidden py-28 md:py-36">
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-background via-accent/15 to-background" />
+        <Container className="max-w-4xl text-center">
+          <p className="reveal font-display text-3xl font-medium leading-[1.25] tracking-tight text-foreground md:text-5xl">
+            <span className="text-accent-foreground/40">“</span>
+            {COPY.philosophy.quote[loc]}
+            <span className="text-accent-foreground/40">”</span>
+          </p>
+          <p className="reveal mt-8 text-sm uppercase tracking-[0.2em] text-muted-foreground">
+            {COPY.philosophy.sign[loc]}
+          </p>
+        </Container>
+      </section>
 
-      {/* REVIEWS ========================================================= */}
-      {reviews.length > 0 && (
-        <Section bleed="muted">
-          <Container>
-            <div className="reveal">
-              <SectionTitle eyebrow={tHome("reviews.title")} title={tHome("reviews.title")} />
+      {/* ═══════════════ FINAL CTA + FORM — cinematic split ═══════════════ */}
+      <section id="apply" className="border-t border-border/60 bg-secondary/40 py-24 md:py-32">
+        <Container className="grid gap-12 lg:grid-cols-[1.1fr_1fr] lg:items-start lg:gap-20">
+          <div className="reveal space-y-6">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+              {tCta("apply")}
+            </p>
+            <h2 className="font-display text-4xl font-semibold leading-[1.05] tracking-tight md:text-6xl">
+              {COPY.finalCta.headline[loc]}
+            </h2>
+            <p className="max-w-md text-base leading-relaxed text-muted-foreground md:text-lg">
+              {COPY.finalCta.sub[loc]}
+            </p>
+            <div className="flex flex-wrap items-center gap-3 pt-2">
+              <WhatsAppButton phone={whatsapp} label={tCta("whatsapp")} size="lg" />
+              {contacts?.phone && (
+                <a
+                  href={`tel:${contacts.phone.replace(/\s+/g, "")}`}
+                  className="inline-flex items-center gap-2 text-sm font-medium text-foreground hover:text-primary"
+                >
+                  {contacts.phone} <ArrowUpRight className="h-4 w-4" />
+                </a>
+              )}
             </div>
-            <div className="reveal-stagger mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-              {reviews.slice(0, 3).map((r) => (
-                <div key={r.id} className="lift">
-                  <ReviewCard review={r} locale={loc} />
-                </div>
-              ))}
-            </div>
-          </Container>
-        </Section>
-      )}
-
-      {/* CONSULTATION + APPLY =========================================== */}
-      <Section id="apply">
-        <Container className="grid gap-10 lg:grid-cols-2 lg:items-start">
-          <div className="reveal space-y-5">
-            <SectionTitle
-              eyebrow={tCommon("title")}
-              title={tField(consultDb, "title", loc) || tCommon("title")}
-              subtitle={tField(consultDb, "subtitle", loc) || tCommon("body")}
-            />
-            <p className="text-sm leading-relaxed text-muted-foreground">{tCommon("body")}</p>
+            {/* Lightweight signal: mention specialists exist, even though we
+                deleted the standalone /specialists page. */}
+            {specialists.length > 0 && (
+              <p className="pt-6 text-xs uppercase tracking-wider text-muted-foreground">
+                {loc === "kk" ? `${specialists.length} маман сізді күтеді` : loc === "en" ? `${specialists.length} specialists are ready to help` : `${specialists.length} специалистов готовы помочь`}
+              </p>
+            )}
           </div>
+
           <div className="reveal">
             <ApplicationForm whatsappNumber={whatsapp} source="home" defaultLanguage={loc} />
           </div>
         </Container>
-      </Section>
+      </section>
     </main>
-  );
-}
-
-function cap<T extends string>(s: T): Capitalize<T> {
-  return (s.charAt(0).toUpperCase() + s.slice(1)) as Capitalize<T>;
-}
-
-const ILLUSTRATION_QUOTES: Record<Locale, { line: string; sub: string }> = {
-  kk: { line: "Біз жанұя үшін осындамыз", sub: "Дамудың әр кезеңінде" },
-  ru: { line: "Мы рядом с семьёй", sub: "На каждом этапе развития" },
-  en: { line: "We are with the family", sub: "At every stage of growth" },
-};
-
-function HeroIllustration({ loc }: { loc: Locale }) {
-  // Soft abstract composition with a quietly floating chip — no children's
-  // faces, no shouting. Adds emotional weight without "AI cliché" gradients.
-  return (
-    <div className="relative mx-auto aspect-square w-full max-w-[480px]">
-      <div className="absolute inset-0 rounded-[42%_58%_55%_45%/60%_40%_60%_40%] bg-primary-soft float-soft" />
-      <div className="absolute inset-5 rounded-[55%_45%_60%_40%/45%_55%_45%_55%] bg-accent/70 float-soft" style={{ animationDelay: "-2s" }} />
-      <div className="absolute inset-12 rounded-[60%_40%_45%_55%/55%_45%_55%_45%] bg-background shadow-card" />
-
-      {/* Floating reassurance chip */}
-      <div className="absolute -left-2 top-10 max-w-[230px] rounded-2xl border border-border/60 bg-background/95 px-4 py-3 shadow-card backdrop-blur lg:-left-6">
-        <div className="flex items-center gap-2.5">
-          <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-success/15 text-success">
-            <Heart className="h-4 w-4" />
-          </span>
-          <div>
-            <p className="text-xs font-semibold leading-tight">{ILLUSTRATION_QUOTES[loc].line}</p>
-            <p className="text-[11px] text-muted-foreground">{ILLUSTRATION_QUOTES[loc].sub}</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Floating "today" stat chip */}
-      <div className="absolute -right-2 bottom-12 rounded-2xl border border-border/60 bg-background/95 px-4 py-3 shadow-card backdrop-blur lg:-right-6">
-        <p className="text-[11px] uppercase tracking-wider text-muted-foreground">
-          {loc === "kk" ? "Тәжірибе" : loc === "en" ? "Experience" : "Опыт"}
-        </p>
-        <p className="font-display text-xl font-semibold leading-none">
-          8+{" "}
-          <span className="text-xs font-medium text-muted-foreground">
-            {loc === "kk" ? "жыл" : loc === "en" ? "yrs" : "лет"}
-          </span>
-        </p>
-      </div>
-
-      <div className="absolute right-10 top-14 h-14 w-14 rounded-full bg-primary/10 ring-1 ring-primary/20 float-soft" style={{ animationDelay: "-1.5s" }} />
-      <div className="absolute bottom-16 left-12 h-9 w-9 rounded-full bg-accent ring-1 ring-accent-foreground/10 float-soft" style={{ animationDelay: "-4s" }} />
-    </div>
   );
 }

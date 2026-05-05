@@ -4,14 +4,12 @@ import { unstable_cache } from "next/cache";
 import { createSupabaseAnonClient } from "@/lib/supabase/anon";
 import { REVALIDATE_TAGS } from "@/lib/constants";
 import type {
-  BlogPost,
   Certificate,
   Contacts,
   Faq,
   GalleryItem,
   HomepageSection,
   PageSeo,
-  Review,
   Service,
   SiteSettings,
   Specialist,
@@ -104,20 +102,6 @@ export const listCertificates = unstable_cache(
   { tags: [REVALIDATE_TAGS.certificates], revalidate: 3600 },
 );
 
-export const listReviews = unstable_cache(
-  async (): Promise<Review[]> => {
-    const supabase = createSupabaseAnonClient();
-    const { data } = await supabase
-      .from("reviews")
-      .select("*")
-      .order("is_featured", { ascending: false })
-      .order("reviewed_at", { ascending: false, nullsFirst: false });
-    return data ?? [];
-  },
-  ["reviews"],
-  { tags: [REVALIDATE_TAGS.reviews], revalidate: 3600 },
-);
-
 export const listFaqs = unstable_cache(
   async (): Promise<Faq[]> => {
     const supabase = createSupabaseAnonClient();
@@ -129,30 +113,6 @@ export const listFaqs = unstable_cache(
   },
   ["faqs"],
   { tags: [REVALIDATE_TAGS.faqs], revalidate: 3600 },
-);
-
-export const listBlogPosts = unstable_cache(
-  async (): Promise<BlogPost[]> => {
-    const supabase = createSupabaseAnonClient();
-    const { data } = await supabase
-      .from("blog_posts")
-      .select("*")
-      .eq("is_published", true)
-      .order("published_at", { ascending: false, nullsFirst: false });
-    return data ?? [];
-  },
-  ["blog_posts"],
-  { tags: [REVALIDATE_TAGS.blog], revalidate: 3600 },
-);
-
-export const getBlogPostBySlug = unstable_cache(
-  async (slug: string): Promise<BlogPost | null> => {
-    const supabase = createSupabaseAnonClient();
-    const { data } = await supabase.from("blog_posts").select("*").eq("slug", slug).maybeSingle();
-    return data;
-  },
-  ["blog_post_by_slug"],
-  { tags: [REVALIDATE_TAGS.blog], revalidate: 3600 },
 );
 
 export const listGallery = unstable_cache(

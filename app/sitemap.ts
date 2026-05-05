@@ -3,17 +3,14 @@ import { createSupabaseAnonClient } from "@/lib/supabase/anon";
 import { locales } from "@/lib/i18n/config";
 import { absoluteUrl } from "@/lib/utils";
 
-const STATIC_PATHS = ["", "/about", "/services", "/specialists", "/parents", "/reviews", "/contacts", "/blog"];
+const STATIC_PATHS = ["", "/about", "/services", "/parents", "/contacts"];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = createSupabaseAnonClient();
-  const [{ data: services }, { data: posts }] = await Promise.all([
-    supabase.from("services").select("slug, updated_at").eq("is_published", true),
-    supabase
-      .from("blog_posts")
-      .select("slug, updated_at, published_at")
-      .eq("is_published", true),
-  ]);
+  const { data: services } = await supabase
+    .from("services")
+    .select("slug, updated_at")
+    .eq("is_published", true);
 
   const now = new Date();
 
@@ -29,7 +26,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
   );
 
-  const serviceEntries: MetadataRoute.Sitemap = (services ?? []).flatMap((s) =>
+  const serviceEntries: MetadataRoute.Sitemap = (services ?? []).flatMap((s: { slug: string; updated_at: string | null }) =>
     locales.map((loc) => ({
       url: absoluteUrl(`/${loc}/services/${s.slug}`),
       lastModified: s.updated_at ? new Date(s.updated_at) : now,
@@ -41,14 +38,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
   );
 
-  const blogEntries: MetadataRoute.Sitemap = (posts ?? []).flatMap((p) =>
-    locales.map((loc) => ({
-      url: absoluteUrl(`/${loc}/blog/${p.slug}`),
-      lastModified: p.updated_at ? new Date(p.updated_at) : p.published_at ? new Date(p.published_at) : now,
-      changeFrequency: "monthly",
-      priority: 0.5,
-    })),
-  );
-
-  return [...staticEntries, ...serviceEntries, ...blogEntries];
+  return [...staticEntries, ...serviceEntries];
 }
