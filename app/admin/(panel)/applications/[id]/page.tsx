@@ -15,10 +15,22 @@ export default async function ApplicationDetail({ params }: { params: Promise<{ 
   const supabase = await createSupabaseServerClient();
   const { data: app } = await supabase
     .from("applications")
-    .select("*, services(slug, title_ru, title_kk), specialists(full_name_ru, full_name_kk)")
+    .select("*")
     .eq("id", id)
     .maybeSingle();
   if (!app) notFound();
+
+  // Fetch related rows separately — predictable typing, RLS still gates them.
+  const [serviceQ, specialistQ] = await Promise.all([
+    app.service_id
+      ? supabase.from("services").select("slug, title_ru, title_kk").eq("id", app.service_id).maybeSingle()
+      : Promise.resolve({ data: null as null | { slug: string | null; title_ru: string | null; title_kk: string | null } }),
+    app.specialist_id
+      ? supabase.from("specialists").select("full_name_ru, full_name_kk").eq("id", app.specialist_id).maybeSingle()
+      : Promise.resolve({ data: null as null | { full_name_ru: string | null; full_name_kk: string | null } }),
+  ]);
+  const service = serviceQ.data;
+  const specialist = specialistQ.data;
 
   const waMessage = `Здравствуйте, ${app.parent_name}! Это центр Сенім. Получили вашу заявку.`;
 
@@ -36,13 +48,19 @@ export default async function ApplicationDetail({ params }: { params: Promise<{ 
           <CardContent className="grid gap-4 p-6">
             <Row label="Телефон">
               <div className="flex flex-wrap items-center gap-2">
-                <a href={formatPhoneHref(app.phone)} className="font-mono text-base hover:text-primary">{app.phone}</a>
+                <a href={formatPhoneHref(app.phone)} className="font-mono text-base hover:text-primary">
+                  {app.phone}
+                </a>
                 <Button asChild size="sm" variant="outline">
-                  <a href={formatPhoneHref(app.phone)}><Phone className="h-3.5 w-3.5" />Позвонить</a>
+                  <a href={formatPhoneHref(app.phone)}>
+                    <Phone className="h-3.5 w-3.5" />
+                    Позвонить
+                  </a>
                 </Button>
                 <Button asChild size="sm" variant="success">
                   <a href={formatWhatsAppHref(app.phone, waMessage)} target="_blank" rel="noopener noreferrer">
-                    <MessageCircle className="h-3.5 w-3.5" />WhatsApp
+                    <MessageCircle className="h-3.5 w-3.5" />
+                    WhatsApp
                   </a>
                 </Button>
               </div>
@@ -51,17 +69,11 @@ export default async function ApplicationDetail({ params }: { params: Promise<{ 
             <Row label="Удобный канал связи">{app.preferred_contact ?? "—"}</Row>
             <Row label="Язык общения">{app.preferred_language ?? "—"}</Row>
             <Row label="Источник">{app.source ?? "—"}</Row>
-            {app.services && (
-              <Row label="Услуга">
-                {(app.services as { title_ru?: string; title_kk?: string; slug?: string }).title_ru ??
-                  (app.services as { title_kk?: string }).title_kk}
-              </Row>
+            {service && (
+              <Row label="Услуга">{service.title_ru || service.title_kk}</Row>
             )}
-            {app.specialists && (
-              <Row label="Специалист">
-                {(app.specialists as { full_name_ru?: string; full_name_kk?: string }).full_name_ru ??
-                  (app.specialists as { full_name_kk?: string }).full_name_kk}
-              </Row>
+            {specialist && (
+              <Row label="Специалист">{specialist.full_name_ru || specialist.full_name_kk}</Row>
             )}
             {app.comment && (
               <Row label="Комментарий">

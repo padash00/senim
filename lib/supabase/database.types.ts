@@ -180,7 +180,18 @@ export type AdminProfile = {
   created_at: string;
 };
 
-type Row<T> = { Row: T; Insert: Partial<T>; Update: Partial<T> };
+/**
+ * Match the shape Supabase v2 expects from generated `Database` types.
+ * Each table needs Row / Insert / Update / Relationships, and the schema
+ * needs Views / Functions / Enums / CompositeTypes — otherwise the
+ * GenericSchema constraint fails and every query collapses to `never`.
+ */
+type Row<T> = {
+  Row: T;
+  Insert: Partial<T>;
+  Update: Partial<T>;
+  Relationships: [];
+};
 
 export interface Database {
   public: {
@@ -199,12 +210,19 @@ export interface Database {
       pages_seo: Row<PageSeo>;
       admin_profiles: Row<AdminProfile>;
     };
-    Views: Record<string, never>;
+    Views: { [_ in never]: never };
     Functions: {
-      is_admin: { Args: Record<string, never>; Returns: boolean };
+      is_admin: {
+        Args: Record<string, never>;
+        Returns: boolean;
+      };
     };
     Enums: {
       application_status: ApplicationStatus;
+      preferred_contact: "phone" | "whatsapp" | "telegram";
+      locale_code: "kk" | "ru" | "en";
+      admin_role: "admin" | "editor";
     };
+    CompositeTypes: { [_ in never]: never };
   };
 }
