@@ -58,8 +58,9 @@ export async function submitApplication(formData: FormData): Promise<SubmitAppli
     .eq("phone", data.phone)
     .gte("created_at", oneMinuteAgo)
     .limit(1);
-  if (recent && recent.length > 0) {
-    return { ok: true, id: recent[0].id };
+  const dup = recent?.[0];
+  if (dup) {
+    return { ok: true, id: dup.id };
   }
 
   const { data: row, error } = await supabase
