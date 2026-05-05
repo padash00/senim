@@ -1,7 +1,6 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { useSearchParams } from "next/navigation";
 import { Globe } from "lucide-react";
 import { useTransition } from "react";
 import { usePathname, useRouter } from "@/lib/i18n/navigation";
@@ -19,16 +18,13 @@ export function LanguageSwitcher({ className }: { className?: string }) {
   const locale = useLocale() as Locale;
   const router = useRouter();
   const pathname = usePathname();
-  const search = useSearchParams();
   const [isPending, startTransition] = useTransition();
 
   function switchTo(next: Locale) {
     if (next === locale) return;
-    const qs = search.toString();
-    const href = qs ? `${pathname}?${qs}` : pathname;
     startTransition(() => {
       // string form preserves the current dynamic path; next-intl swaps the locale prefix
-      router.replace(href, { locale: next });
+      router.replace(pathname, { locale: next });
     });
   }
 
