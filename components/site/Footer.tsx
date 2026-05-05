@@ -77,7 +77,6 @@ export function Footer({ locale, contacts, tagline }: Props) {
             {(["about", "services", "specialists", "parents", "reviews", "blog"] as const).map((key) => (
               <li key={key}>
                 <Link
-                  /* @ts-expect-error typed-routes */
                   href={`/${key}`}
                   className="text-muted-foreground transition-colors hover:text-primary"
                 >

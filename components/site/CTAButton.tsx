@@ -27,7 +27,6 @@ export function CTAButton({
   }
   return (
     <Button asChild {...buttonProps}>
-      {/* @ts-expect-error — next-intl Link accepts string href at runtime */}
       <Link href={href}>
         {children}
         {showArrow && <ArrowRight />}

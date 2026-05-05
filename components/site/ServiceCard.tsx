@@ -37,7 +37,6 @@ export function ServiceCard({ service, locale }: { service: Service; locale: Loc
           {description && <p className="text-sm leading-relaxed text-muted-foreground">{description}</p>}
         </div>
         <Link
-          /* @ts-expect-error typed-routes */
           href={`/services/${service.slug}`}
           className="mt-auto inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
         >

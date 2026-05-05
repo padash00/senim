@@ -39,7 +39,6 @@ export function Header({ tagline }: { tagline?: string }) {
             return (
               <Link
                 key={href}
-                /* @ts-expect-error typed-routes */
                 href={href}
                 className={cn(
                   "rounded-full px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground",
@@ -75,7 +74,6 @@ export function Header({ tagline }: { tagline?: string }) {
             {NAV.map(({ href, key }) => (
               <Link
                 key={href}
-                /* @ts-expect-error typed-routes */
                 href={href}
                 onClick={() => setOpen(false)}
                 className="rounded-xl px-3 py-2.5 text-base font-medium hover:bg-secondary"

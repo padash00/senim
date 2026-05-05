@@ -50,7 +50,6 @@ export default async function BlogIndex({ params }: { params: Promise<{ locale: 
                 return (
                   <Link
                     key={p.id}
-                    /* @ts-expect-error typed-routes */
                     href={`/blog/${p.slug}`}
                     className="group block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-2xl"
                   >
