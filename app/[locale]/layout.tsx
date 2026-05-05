@@ -3,7 +3,8 @@ import { getMessages, getTranslations, setRequestLocale } from "next-intl/server
 import { notFound } from "next/navigation";
 import { Toaster } from "sonner";
 import { routing } from "@/lib/i18n/routing";
-import { LOCALE_TAGLINE, type Locale } from "@/lib/i18n/config";
+import type { Locale } from "@/lib/i18n/config";
+import { LOCALE_TAGLINE } from "@/lib/constants";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { WhatsAppFloating } from "@/components/site/WhatsAppButton";
