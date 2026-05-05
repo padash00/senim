@@ -162,9 +162,11 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const heroDb = sections.find((s) => s.key === "hero");
   const whatsapp = contacts?.whatsapp || env.NEXT_PUBLIC_WHATSAPP_NUMBER;
 
-  // Stat numbers — let admin override "11" if they edit homepage_sections.
-  const stats = [...COPY.stats];
-  stats[1] = { ...stats[1], number: String(services.length || 11) };
+  // Stat numbers — admin sees a live count of published services in the
+  // middle stat once they start filling the catalogue.
+  const stats = COPY.stats.map((stat, i) =>
+    i === 1 ? { ...stat, number: String(services.length || 11) } : stat,
+  );
 
   // CMS overrides for hero (admin can rewrite headline / subtitle from /admin/homepage)
   const heroOverrideTitle = tField(heroDb, "title", loc);
