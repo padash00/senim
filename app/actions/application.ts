@@ -52,15 +52,13 @@ export async function submitApplication(formData: FormData): Promise<SubmitAppli
   // pretend success without creating a duplicate row. Catches double-clicks,
   // accidental refresh resubmissions, and bots that bypass the honeypot.
   const oneMinuteAgo = new Date(Date.now() - 60_000).toISOString();
-  const { data: recent } = await supabase
+  const { count } = await supabase
     .from("applications")
-    .select("id")
+    .select("id", { count: "exact", head: true })
     .eq("phone", data.phone)
-    .gte("created_at", oneMinuteAgo)
-    .limit(1);
-  const dup = recent?.[0];
-  if (dup) {
-    return { ok: true, id: dup.id };
+    .gte("created_at", oneMinuteAgo);
+  if (count && count > 0) {
+    return { ok: true, id: "deduped" };
   }
 
   const { data: row, error } = await supabase
