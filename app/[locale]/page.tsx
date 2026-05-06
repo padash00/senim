@@ -447,6 +447,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           alt=""
           fill
           sizes="100vw"
+          quality={60}
+          loading="lazy"
           className="-z-20 object-cover opacity-25 dark:opacity-15"
           aria-hidden
         />
@@ -489,8 +491,16 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
               { url: "https://images.unsplash.com/photo-1606092195730-5d7b9af1efc5?auto=format&fit=crop&w=900&q=70", alt: "Творческие занятия" },
               { url: "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?auto=format&fit=crop&w=900&q=70", alt: "Пространство для занятий" },
             ].map((img, i) => (
-              <div key={i} className="lift relative aspect-[4/3] overflow-hidden rounded-3xl bg-secondary">
-                <Image src={img.url} alt={img.alt} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
+              <div key={i} className="lift group relative aspect-[4/3] overflow-hidden rounded-3xl bg-secondary">
+                <Image
+                  src={img.url}
+                  alt={img.alt}
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  quality={70}
+                  loading="lazy"
+                  className="object-cover transition-transform duration-700 group-hover:scale-110"
+                />
               </div>
             ))}
           </div>

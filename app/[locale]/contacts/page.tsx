@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { Instagram, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import { Container } from "@/components/site/Container";
@@ -42,11 +43,27 @@ export default async function ContactsPage({ params }: { params: Promise<{ local
   return (
     <main id="main">
       <JsonLd contacts={contacts} locale={loc} />
-      <Section bleed="primary-soft" className="pt-12 md:pt-20">
-        <Container>
-          <SectionTitle eyebrow={t("contacts")} title={t("contacts")} />
+
+      {/* HERO with photo banner */}
+      <section className="relative overflow-hidden">
+        <div className="relative h-[36vh] min-h-[260px] w-full overflow-hidden">
+          <Image
+            src="https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?auto=format&fit=crop&w=2000&q=75"
+            alt=""
+            fill
+            sizes="100vw"
+            priority
+            quality={75}
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-foreground/15 via-foreground/35 to-background" />
+        </div>
+        <Container className="relative -mt-24 md:-mt-32">
+          <div className="rounded-3xl border border-border/60 bg-background/95 p-8 shadow-card backdrop-blur md:p-10">
+            <SectionTitle eyebrow={t("contacts")} title={t("contacts")} />
+          </div>
         </Container>
-      </Section>
+      </section>
 
       <Section>
         <Container className="grid gap-10 lg:grid-cols-[1fr_1.2fr]">

@@ -40,6 +40,13 @@ const config: NextConfig = {
       { protocol: "https" as const, hostname: "images.unsplash.com" },
     ],
     formats: ["image/avif", "image/webp"],
+    // Cache optimised images on the Vercel CDN for 30 days — both Unsplash
+    // assets and Supabase Storage public files are immutable per URL.
+    minimumCacheTTL: 60 * 60 * 24 * 30,
+    // Tighter device-size buckets — fewer variants generated, leaner cache,
+    // still covers every realistic mobile/tablet/laptop width.
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
   // typedRoutes left disabled: forces every dynamic href into a `Route` cast,
   // which is busywork for a marketing site. Re-enable once URL stability is

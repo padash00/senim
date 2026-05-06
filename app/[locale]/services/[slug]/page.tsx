@@ -77,17 +77,31 @@ export default async function ServiceDetailPage({ params }: Props) {
               <WhatsAppButton phone={whatsapp} label="WhatsApp" variant="outline" size="lg" />
             </div>
           </div>
-          {service.image_url && (
-            <div className="relative aspect-[4/5] w-full overflow-hidden rounded-3xl bg-secondary">
-              <Image
-                src={service.image_url}
-                alt={title}
-                fill
-                sizes="(max-width: 1024px) 100vw, 480px"
-                className="object-cover"
-              />
-            </div>
-          )}
+          {(() => {
+            const SLUG_PHOTO: Record<string, string> = {
+              aba:           "https://images.unsplash.com/photo-1587654780291-39c9404d746b?auto=format&fit=crop&w=1200&q=75",
+              logoped:       "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1200&q=75",
+              defektolog:    "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?auto=format&fit=crop&w=1200&q=75",
+              afk:           "https://images.unsplash.com/photo-1546015720-b8b30df5aa27?auto=format&fit=crop&w=1200&q=75",
+              sensory:       "https://images.unsplash.com/photo-1505932049984-3da4d05fbab1?auto=format&fit=crop&w=1200&q=75",
+              psychologist:  "https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&w=1200&q=75",
+              neuropsy:      "https://images.unsplash.com/photo-1606092195730-5d7b9af1efc5?auto=format&fit=crop&w=1200&q=75",
+            };
+            const src = service.image_url ?? SLUG_PHOTO[slug] ?? SLUG_PHOTO.aba;
+            return (
+              <div className="relative aspect-[4/5] w-full overflow-hidden rounded-3xl bg-secondary lift">
+                <Image
+                  src={src!}
+                  alt={title}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 480px"
+                  priority
+                  quality={75}
+                  className="object-cover"
+                />
+              </div>
+            );
+          })()}
         </Container>
       </Section>
 

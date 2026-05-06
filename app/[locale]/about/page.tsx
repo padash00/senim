@@ -63,40 +63,57 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
 
   return (
     <main id="main">
-      {/* HERO */}
-      <Section bleed="primary-soft" className="pt-12 md:pt-20">
-        <Container>
-          <SectionTitle
-            eyebrow={t("about")}
-            title={
-              loc === "kk"
-                ? "Сенім — балалар мен отбасыларға арналған тыныш кеңістік"
-                : loc === "en"
-                  ? "Senim — a calm space for children and families"
-                  : "Сенім — спокойное пространство для детей и семей"
-            }
-            subtitle={MISSION[loc]}
+      {/* HERO with full-bleed photo banner */}
+      <section className="relative overflow-hidden">
+        <div className="relative h-[44vh] min-h-[320px] w-full overflow-hidden">
+          <Image
+            src="https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&w=2000&q=75"
+            alt=""
+            fill
+            sizes="100vw"
+            priority
+            quality={75}
+            className="object-cover"
           />
+          <div className="absolute inset-0 bg-gradient-to-b from-foreground/10 via-foreground/30 to-background" />
+        </div>
+        <Container className="relative -mt-32 md:-mt-40">
+          <div className="rounded-3xl border border-border/60 bg-background/95 p-8 shadow-card backdrop-blur md:p-12">
+            <SectionTitle
+              eyebrow={t("about")}
+              title={
+                loc === "kk"
+                  ? "Сенім — балалар мен отбасыларға арналған тыныш кеңістік"
+                  : loc === "en"
+                    ? "Senim — a calm space for children and families"
+                    : "Сенім — спокойное пространство для детей и семей"
+              }
+              subtitle={MISSION[loc]}
+            />
+          </div>
         </Container>
-      </Section>
+      </section>
 
-      {/* APPROACH */}
+      {/* APPROACH — text + photo card */}
       <Section>
         <Container className="grid gap-10 lg:grid-cols-2 lg:items-center">
           <div className="space-y-4">
-            <h3 className="font-display text-2xl font-semibold">
+            <h3 className="font-display text-2xl font-semibold md:text-3xl">
               {loc === "kk" ? "Біздің тәсілдеміз" : loc === "en" ? "Our approach" : "Наш подход"}
             </h3>
             <p className="text-base leading-relaxed text-muted-foreground">{APPROACH[loc]}</p>
+            <p className="text-base leading-relaxed text-muted-foreground">{SPACE[loc]}</p>
           </div>
-          <Card>
-            <CardContent className="p-6">
-              <h4 className="text-lg font-semibold">
-                {loc === "kk" ? "Орталық кеңістігі" : loc === "en" ? "Our space" : "Пространство центра"}
-              </h4>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{SPACE[loc]}</p>
-            </CardContent>
-          </Card>
+          <div className="lift relative aspect-[4/5] w-full overflow-hidden rounded-3xl bg-secondary">
+            <Image
+              src="https://images.unsplash.com/photo-1587654780291-39c9404d746b?auto=format&fit=crop&w=1200&q=75"
+              alt={loc === "kk" ? "Орталық кеңістігі" : loc === "en" ? "Our space" : "Пространство центра"}
+              fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              quality={75}
+              className="object-cover"
+            />
+          </div>
         </Container>
       </Section>
 
