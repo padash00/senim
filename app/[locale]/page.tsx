@@ -13,6 +13,8 @@ import { Marquee } from "@/components/site/Marquee";
 import { SectionLabel } from "@/components/site/SectionLabel";
 import { SectionDivider } from "@/components/site/SectionDivider";
 import { TiltCard } from "@/components/site/TiltCard";
+import { HeroArt } from "@/components/site/HeroArt";
+import Image from "next/image";
 import {
   getContacts,
   getHomepageSections,
@@ -248,38 +250,45 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             <span className="ml-auto hidden text-muted-foreground/60 md:inline">{COPY.hero.pretitle[loc]} · 2026</span>
           </div>
 
-          {heroOverrideTitle ? (
-            <h1 className="reveal mt-12 max-w-[18ch] font-display text-[2.8rem] font-semibold leading-[1.02] tracking-tight md:text-[5rem] lg:text-[6.5rem]">
-              {heroOverrideTitle}
-            </h1>
-          ) : (
-            <h1 className="reveal mt-12 font-display text-[2.8rem] leading-[1.02] tracking-tight md:text-[5rem] lg:text-[6.5rem]">
-              {/* Mixed weights + gradient anchor word */}
-              <span className="block font-medium">
-                {COPY.hero.line1Before[loc]}
-                <span className="font-bold text-gradient">{COPY.hero.line1Word[loc]}</span>
-                {COPY.hero.line1After[loc]}
-              </span>
-              <span className="block font-light text-muted-foreground/65">{COPY.hero.line2[loc]}</span>
-              <span className="block font-extrabold">{COPY.hero.line3[loc]}</span>
-            </h1>
-          )}
+          {/* Two-column composition: text on the left, illustration on the right (lg+).
+              On mobile/tablet the illustration shows below the text. */}
+          <div className="mt-12 grid items-start gap-12 lg:mt-16 lg:grid-cols-[1.15fr_1fr] lg:items-center lg:gap-14">
+            <div>
+              {heroOverrideTitle ? (
+                <h1 className="reveal max-w-[18ch] font-display text-[2.8rem] font-semibold leading-[1.02] tracking-tight md:text-[4.6rem] lg:text-[5.6rem]">
+                  {heroOverrideTitle}
+                </h1>
+              ) : (
+                <h1 className="reveal font-display text-[2.8rem] leading-[1.02] tracking-tight md:text-[4.6rem] lg:text-[5.6rem]">
+                  <span className="block font-medium">
+                    {COPY.hero.line1Before[loc]}
+                    <span className="font-bold text-gradient">{COPY.hero.line1Word[loc]}</span>
+                    {COPY.hero.line1After[loc]}
+                  </span>
+                  <span className="block font-light text-muted-foreground/65">{COPY.hero.line2[loc]}</span>
+                  <span className="block font-extrabold">{COPY.hero.line3[loc]}</span>
+                </h1>
+              )}
 
-          <div className="reveal mt-12 grid gap-10 lg:mt-16 lg:grid-cols-[2fr_1fr] lg:items-end">
-            <p className="max-w-2xl text-lg leading-relaxed text-muted-foreground md:text-xl">
-              {heroOverrideSub || COPY.hero.sub[loc]}
-            </p>
+              <p className="reveal mt-8 max-w-xl text-lg leading-relaxed text-muted-foreground md:text-xl">
+                {heroOverrideSub || COPY.hero.sub[loc]}
+              </p>
 
-            <div className="flex flex-col items-start gap-4 lg:items-end">
-              <div className="flex flex-wrap items-center gap-3">
+              <div className="reveal mt-8 flex flex-wrap items-center gap-3">
                 <CTAButton href="/contacts#apply" size="lg" showArrow>
                   {tCta("apply")}
                 </CTAButton>
                 <WhatsAppButton phone={whatsapp} label={tCta("whatsapp")} variant="outline" size="lg" />
               </div>
-              <p className="max-w-xs text-sm leading-snug text-muted-foreground/85 lg:text-right">
+
+              <p className="reveal mt-6 max-w-md text-sm leading-snug text-muted-foreground/85">
+                <span aria-hidden className="mr-1.5 inline-block h-1 w-1 rounded-full bg-accent-foreground/50 align-middle" />
                 {COPY.hero.reassure[loc]}
               </p>
+            </div>
+
+            <div className="reveal">
+              <HeroArt />
             </div>
           </div>
 
@@ -389,7 +398,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                 key={s.id}
                 className={i === 0 ? "md:col-span-2 md:row-span-2" : ""}
               >
-                <ServiceCard service={s} locale={loc} />
+                <ServiceCard service={s} locale={loc} featured={i === 0} />
               </TiltCard>
             ))}
           </div>
@@ -431,9 +440,19 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
       {/* ═══════════════ PHILOSOPHY — drop-cap quote, full-bleed ═══════════════ */}
       <section className="relative overflow-hidden py-28 md:py-36">
-        <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-background via-accent/20 to-background" />
+        {/* Warm photo backdrop (Unsplash) — wooden toys / soft interior.
+            Heavily darkened/lightened so text remains readable. */}
+        <Image
+          src="https://images.unsplash.com/photo-1587654780291-39c9404d746b?auto=format&fit=crop&w=1600&q=70"
+          alt=""
+          fill
+          sizes="100vw"
+          className="-z-20 object-cover opacity-25 dark:opacity-15"
+          aria-hidden
+        />
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-background/95 via-background/80 to-background/95" />
         {/* Massive decorative quotation mark */}
-        <span aria-hidden className="pointer-events-none absolute left-4 top-10 -z-10 select-none font-display text-[14rem] font-bold leading-none text-accent-foreground/10 md:text-[22rem]">
+        <span aria-hidden className="pointer-events-none absolute left-4 top-10 -z-10 select-none font-display text-[14rem] font-bold leading-none text-accent-foreground/15 md:text-[22rem]">
           “
         </span>
         <Container className="max-w-4xl">
@@ -448,6 +467,33 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           <p className="reveal mt-10 text-sm uppercase tracking-[0.2em] text-muted-foreground">
             {COPY.philosophy.sign[loc]}
           </p>
+        </Container>
+      </section>
+
+      {/* ═══════════════ ATMOSPHERE — three warm photos showing the centre's vibe ═══════════════ */}
+      <section className="py-16 md:py-20">
+        <Container>
+          <div className="reveal mb-8 max-w-2xl space-y-4">
+            <SectionLabel number="·">{loc === "kk" ? "Атмосфера" : loc === "en" ? "Atmosphere" : "Атмосфера"}</SectionLabel>
+            <p className="font-display text-2xl font-medium leading-snug text-muted-foreground md:text-3xl">
+              {loc === "kk"
+                ? "Тыныш, жайлы және балаға таныс орта."
+                : loc === "en"
+                  ? "Calm, comfortable and familiar to the child."
+                  : "Спокойная, мягкая и знакомая ребёнку среда."}
+            </p>
+          </div>
+          <div className="reveal-stagger grid gap-3 md:grid-cols-3">
+            {[
+              { url: "https://images.unsplash.com/photo-1587654780291-39c9404d746b?auto=format&fit=crop&w=900&q=70", alt: "Деревянные развивающие игрушки" },
+              { url: "https://images.unsplash.com/photo-1606092195730-5d7b9af1efc5?auto=format&fit=crop&w=900&q=70", alt: "Творческие занятия" },
+              { url: "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?auto=format&fit=crop&w=900&q=70", alt: "Пространство для занятий" },
+            ].map((img, i) => (
+              <div key={i} className="lift relative aspect-[4/3] overflow-hidden rounded-3xl bg-secondary">
+                <Image src={img.url} alt={img.alt} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
+              </div>
+            ))}
+          </div>
         </Container>
       </section>
 

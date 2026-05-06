@@ -35,6 +35,9 @@ const config: NextConfig = {
       ...(supabaseHost
         ? [{ protocol: "https" as const, hostname: supabaseHost, pathname: "/storage/v1/object/public/**" }]
         : []),
+      // Free Unsplash photos used as visual fallbacks until the admin uploads
+      // real assets through /admin.
+      { protocol: "https" as const, hostname: "images.unsplash.com" },
     ],
     formats: ["image/avif", "image/webp"],
   },
