@@ -116,7 +116,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
             <p className="text-base leading-relaxed text-muted-foreground">{APPROACH[loc]}</p>
             <p className="text-base leading-relaxed text-muted-foreground">{SPACE[loc]}</p>
           </div>
-          <div className="lift relative aspect-[4/5] w-full overflow-hidden rounded-3xl bg-secondary">
+          <div className="lift mask-blob relative aspect-[4/5] w-full overflow-hidden bg-secondary shadow-card">
             <Image
               src="https://images.unsplash.com/photo-1587654780291-39c9404d746b?auto=format&fit=crop&w=1200&q=75"
               alt={loc === "kk" ? "Орталық кеңістігі" : loc === "en" ? "Our space" : "Пространство центра"}

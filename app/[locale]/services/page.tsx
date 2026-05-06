@@ -8,6 +8,7 @@ import { ServiceCard } from "@/components/site/ServiceCard";
 import { listServices } from "@/lib/db/queries";
 import { buildMetadata } from "@/lib/seo";
 import { Breadcrumbs } from "@/components/site/Breadcrumbs";
+import { CompareMatrix } from "@/components/site/CompareMatrix";
 import type { Locale } from "@/lib/i18n/config";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
@@ -69,6 +70,13 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
               ))}
             </div>
           )}
+        </Container>
+      </Section>
+
+      {/* Compare matrix — what every programme shares */}
+      <Section bleed="muted">
+        <Container className="max-w-3xl">
+          <CompareMatrix locale={loc} />
         </Container>
       </Section>
     </main>

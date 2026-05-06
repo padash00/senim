@@ -8,6 +8,7 @@ import { LanguageSwitcher } from "./LanguageSwitcher";
 import { Logo } from "./Logo";
 import { CTAButton } from "./CTAButton";
 import { ThemeToggle } from "./ThemeToggle";
+import { FontSizeControl } from "./FontSizeControl";
 import { cn } from "@/lib/utils";
 
 // Compressed nav: 4 entry points instead of 8. Keeps the header airy and
@@ -72,6 +73,7 @@ export function Header({ tagline }: { tagline?: string }) {
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
+          <FontSizeControl className="hidden xl:inline-flex" />
           <ThemeToggle className="hidden sm:inline-flex" />
           <LanguageSwitcher />
           <CTAButton href="/contacts#apply" size="sm" className="hidden md:inline-flex">

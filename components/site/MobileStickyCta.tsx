@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MessageCircle, Phone } from "lucide-react";
+import { MessageCircle, MessageSquare, Phone } from "lucide-react";
 import { formatPhoneHref, formatWhatsAppHref, cn } from "@/lib/utils";
 
 type Props = {
@@ -57,6 +57,15 @@ export function MobileStickyCta({ phone, whatsapp }: Props) {
         >
           <MessageCircle className="h-4 w-4" />
           WhatsApp
+        </a>
+      )}
+      {phone && (
+        <a
+          href={`sms:${phone.replace(/\s+/g, "")}?body=${encodeURIComponent("Здравствуйте, я хочу записаться в центр Сенім")}`}
+          aria-label="SMS"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border/70 bg-background text-foreground active:scale-95"
+        >
+          <MessageSquare className="h-4 w-4" />
         </a>
       )}
     </div>

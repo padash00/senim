@@ -113,6 +113,10 @@
   :focus-visible {
     @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
   }
+  /* Warm focus glow — applies to inputs/textareas/selects on top of the ring */
+  input:focus-visible, textarea:focus-visible, select:focus-visible {
+    box-shadow: 0 0 0 4px hsl(var(--accent) / 0.55);
+  }
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     *, *::before, *::after {
@@ -215,6 +219,18 @@
   from { transform: translateY(0); }
   to   { transform: translateY(-60px); }
 }
+@keyframes mesh-shift {
+  0%, 100% { background-position: 0% 0%, 100% 0%, 50% 100%, 0% 100%; }
+  50%      { background-position: 20% 10%, 80% 20%, 40% 90%, 10% 80%; }
+}
+@keyframes timeline-fill {
+  from { transform: scaleY(0); }
+  to   { transform: scaleY(1); }
+}
+@keyframes skeleton-shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
 
 @layer utilities {
   /* Default state: ALWAYS visible. The reveal animation only ever runs in
@@ -273,6 +289,57 @@
       radial-gradient(at 80% 0%,  hsl(var(--primary-soft) / 0.7), transparent 55%),
       radial-gradient(at 60% 80%, hsl(var(--accent) / 0.35), transparent 60%),
       radial-gradient(at 0% 90%,  hsl(var(--primary-soft) / 0.5), transparent 50%);
+    background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+    background-position: 0% 0%, 100% 0%, 50% 100%, 0% 100%;
+    animation: mesh-shift 22s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .mesh-bg { animation: none; }
+  }
+
+  /* Asymmetric photo masks — mainly for portraits and feature images. */
+  .mask-blob {
+    -webkit-mask-image: radial-gradient(ellipse 80% 90% at 50% 45%, black 60%, transparent 75%);
+            mask-image: radial-gradient(ellipse 80% 90% at 50% 45%, black 60%, transparent 75%);
+    border-radius: 42% 58% 55% 45% / 60% 40% 60% 40%;
+  }
+  .mask-wave {
+    border-radius: 60% 40% 60% 40% / 65% 60% 40% 35%;
+  }
+  .mask-leaf {
+    border-radius: 0 70% 0 70% / 0 70% 0 70%;
+  }
+
+  /* Skeleton shimmer for loading states. */
+  .skeleton-shimmer {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--muted)) 0%,
+      hsl(var(--muted-foreground) / 0.1) 50%,
+      hsl(var(--muted)) 100%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.6s linear infinite;
+  }
+
+  /* Process timeline — vertical line that "fills" with primary color as the
+     reader scrolls past the timeline list. Pure CSS via scroll-timeline. */
+  .timeline-progress {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: hsl(var(--primary));
+    transform-origin: top;
+    transform: scaleY(0);
+  }
+  @supports (animation-timeline: view()) {
+    .timeline-progress {
+      animation: timeline-fill linear both;
+      animation-timeline: view();
+      animation-range: cover 5% cover 95%;
+    }
   }
 
   /* Subtle dot pattern for secondary sections. */

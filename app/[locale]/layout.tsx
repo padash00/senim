@@ -11,6 +11,8 @@ import { WhatsAppFloating } from "@/components/site/WhatsAppButton";
 import { MobileStickyCta } from "@/components/site/MobileStickyCta";
 import { CursorFollower } from "@/components/site/CursorFollower";
 import { BackToTop } from "@/components/site/BackToTop";
+import { FirstVisitHint } from "@/components/site/FirstVisitHint";
+import { KeyboardShortcuts } from "@/components/site/KeyboardShortcuts";
 import { getContacts } from "@/lib/db/queries";
 import { env } from "@/lib/env";
 
@@ -48,6 +50,8 @@ export default async function LocaleLayout({ children, params }: Props) {
       </div>
       <CursorFollower />
       <BackToTop />
+      <FirstVisitHint />
+      <KeyboardShortcuts />
       <WhatsAppFloating phone={whatsapp} label={t("whatsapp")} />
       <MobileStickyCta phone={contacts?.phone} whatsapp={whatsapp} />
       <Toaster richColors position="top-center" closeButton />

@@ -12,6 +12,7 @@ import { JsonLd } from "@/components/site/JsonLd";
 import { Marquee } from "@/components/site/Marquee";
 import { SectionLabel } from "@/components/site/SectionLabel";
 import { SectionDivider } from "@/components/site/SectionDivider";
+import { SectionDiagonal } from "@/components/site/SectionDiagonal";
 import { TiltCard } from "@/components/site/TiltCard";
 import { HeroArt } from "@/components/site/HeroArt";
 import { BentoGrid } from "@/components/site/BentoGrid";
@@ -360,8 +361,11 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
       <SectionDivider />
 
+      {/* Diagonal slope into the soft-blue stats section */}
+      <SectionDiagonal fillVar="background" variant="wave" />
+
       {/* ═══════════════ STATS — quietly confident numbers ═══════════════ */}
-      <section className="border-y border-border/50 bg-primary-soft/30 py-20 md:py-24">
+      <section className="relative border-y border-border/50 bg-primary-soft/30 py-20 md:py-24">
         <Container>
           <div className="reveal mb-10 max-w-xl">
             <SectionLabel number="02">{loc === "kk" ? "Цифрлармен" : loc === "en" ? "By the numbers" : "В цифрах"}</SectionLabel>
@@ -440,6 +444,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             </div>
 
             <ol className="reveal-stagger relative space-y-3 border-l border-dashed border-border/80 pl-8 lg:pl-12">
+              {/* Solid primary line that fills as the reader scrolls */}
+              <div aria-hidden className="timeline-progress" />
               {COPY.process.steps.map((step, i) => (
                 <li key={i} className="relative">
                   <span className="absolute -left-[2.6rem] top-2 inline-flex h-7 w-7 items-center justify-center rounded-full border border-border/70 bg-background font-mono text-[11px] font-semibold text-primary lg:-left-[3.4rem] lg:h-9 lg:w-9 lg:text-xs">
