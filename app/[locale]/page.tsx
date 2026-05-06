@@ -249,11 +249,11 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           </div>
 
           {heroOverrideTitle ? (
-            <h1 className="reveal hero-parallax mt-12 max-w-[18ch] font-display text-[2.8rem] font-semibold leading-[1.02] tracking-tight md:text-[5rem] lg:text-[6.5rem]">
+            <h1 className="reveal mt-12 max-w-[18ch] font-display text-[2.8rem] font-semibold leading-[1.02] tracking-tight md:text-[5rem] lg:text-[6.5rem]">
               {heroOverrideTitle}
             </h1>
           ) : (
-            <h1 className="reveal hero-parallax mt-12 font-display text-[2.8rem] leading-[1.02] tracking-tight md:text-[5rem] lg:text-[6.5rem]">
+            <h1 className="reveal mt-12 font-display text-[2.8rem] leading-[1.02] tracking-tight md:text-[5rem] lg:text-[6.5rem]">
               {/* Mixed weights + gradient anchor word */}
               <span className="block font-medium">
                 {COPY.hero.line1Before[loc]}

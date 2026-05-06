@@ -168,13 +168,11 @@
 /* ----------------------------------------------------------------------------
  * Animations
  * --------------------------------------------------------------------------*/
-@keyframes reveal-up {
-  from { opacity: 0; transform: translateY(28px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes reveal-fade {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+/* Transform-only reveal — opacity stays at 1 so text never disappears
+   on browsers where animation-timeline:view() fails to activate. */
+@keyframes reveal-up-safe {
+  from { transform: translateY(20px); }
+  to   { transform: translateY(0); }
 }
 @keyframes float-soft {
   0%, 100% { transform: translateY(0) rotate(0deg); }
@@ -219,24 +217,26 @@
 }
 
 @layer utilities {
-  .reveal { opacity: 1; }
+  /* Default state: ALWAYS visible. The reveal animation only ever runs in
+     browsers that support animation-timeline:view(); even there, we never
+     drive opacity from 0 because timeline-driven animations may not start
+     for elements that are already in the viewport on first paint, leaving
+     them invisible. We animate transform only, so the worst case is "no
+     entrance animation" — never "no text". */
+  .reveal,
+  .reveal-fade,
+  .reveal-stagger > * {
+    opacity: 1;
+  }
 
   @supports (animation-timeline: view()) {
     .reveal {
-      opacity: 0;
-      animation: reveal-up 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+      animation: reveal-up-safe 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
       animation-timeline: view();
       animation-range: entry 0% cover 28%;
     }
-    .reveal-fade {
-      opacity: 0;
-      animation: reveal-fade 800ms ease-out both;
-      animation-timeline: view();
-      animation-range: entry 0% cover 30%;
-    }
     .reveal-stagger > * {
-      opacity: 0;
-      animation: reveal-up 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+      animation: reveal-up-safe 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
       animation-timeline: view();
       animation-range: entry 0% cover 35%;
     }
@@ -366,14 +366,6 @@
     animation: confetti-burst 900ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
   }
 
-  /* Hero parallax — text rises gently as the section is scrolled past. */
-  @supports (animation-timeline: view()) {
-    .hero-parallax {
-      animation: hero-parallax linear both;
-      animation-timeline: view();
-      animation-range: exit 0% exit 100%;
-    }
-  }
 
   /* Scroll-progress bar at the top of the viewport. Pure CSS via
      scroll-timeline — no JS, no rerenders. Falls back to invisible. */
