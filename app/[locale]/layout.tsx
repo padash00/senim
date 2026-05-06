@@ -9,6 +9,7 @@ import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { WhatsAppFloating } from "@/components/site/WhatsAppButton";
 import { MobileStickyCta } from "@/components/site/MobileStickyCta";
+import { CursorFollower } from "@/components/site/CursorFollower";
 import { getContacts } from "@/lib/db/queries";
 import { env } from "@/lib/env";
 
@@ -44,6 +45,7 @@ export default async function LocaleLayout({ children, params }: Props) {
         <div className="flex-1">{children}</div>
         <Footer locale={locale as Locale} contacts={contacts} tagline={tagline} />
       </div>
+      <CursorFollower />
       <WhatsAppFloating phone={whatsapp} label={t("whatsapp")} />
       <MobileStickyCta phone={contacts?.phone} whatsapp={whatsapp} />
       <Toaster richColors position="top-center" closeButton />

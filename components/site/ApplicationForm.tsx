@@ -161,7 +161,8 @@ export function ApplicationForm({
     }`;
     return (
       <Card className={className} aria-live="polite">
-        <CardContent className="flex flex-col items-center gap-5 py-12 text-center">
+        <CardContent className="relative flex flex-col items-center gap-5 py-12 text-center">
+          <ConfettiBurst />
           <AnimatedCheck />
           <p className="text-lg font-medium">{t("success")}</p>
           {whatsappNumber && (
@@ -297,6 +298,42 @@ function FieldError({ msgKey }: { msgKey?: string }) {
   const t = useTranslations();
   if (!msgKey) return null;
   return <p className="text-xs text-destructive">{t(msgKey)}</p>;
+}
+
+/**
+ * Tiny confetti burst — 12 colour-tinted pieces fly out from the centre
+ * with random vector + rotation. Pure CSS animation via custom properties.
+ */
+function ConfettiBurst() {
+  const colors = ["hsl(var(--primary))", "hsl(var(--accent-foreground))", "hsl(var(--success))", "hsl(var(--warning))"];
+  const pieces = Array.from({ length: 14 }, (_, i) => {
+    const angle = (i / 14) * Math.PI * 2 + Math.random() * 0.3;
+    const dist = 80 + Math.random() * 40;
+    return {
+      id: i,
+      cx: Math.cos(angle) * dist,
+      cy: Math.sin(angle) * dist,
+      color: colors[i % colors.length],
+      delay: Math.random() * 80,
+    };
+  });
+  return (
+    <span aria-hidden className="pointer-events-none absolute left-1/2 top-16 h-0 w-0">
+      {pieces.map((p) => (
+        <span
+          key={p.id}
+          className="confetti-piece"
+          style={{
+            background: p.color,
+            ["--cx" as string]: `${p.cx}px`,
+            ["--cy" as string]: `${p.cy}px`,
+            animationDelay: `${p.delay}ms`,
+            transform: `rotate(${(p.id * 30) % 180}deg)`,
+          }}
+        />
+      ))}
+    </span>
+  );
 }
 
 /**

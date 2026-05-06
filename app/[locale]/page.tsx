@@ -9,6 +9,10 @@ import { ApplicationForm } from "@/components/site/ApplicationForm";
 import { AnimatedNumber } from "@/components/site/AnimatedNumber";
 import { AudienceWord } from "@/components/site/AudienceWord";
 import { JsonLd } from "@/components/site/JsonLd";
+import { Marquee } from "@/components/site/Marquee";
+import { SectionLabel } from "@/components/site/SectionLabel";
+import { SectionDivider } from "@/components/site/SectionDivider";
+import { TiltCard } from "@/components/site/TiltCard";
 import {
   getContacts,
   getHomepageSections,
@@ -34,7 +38,11 @@ const COPY = {
   hero: {
     eyebrow: { kk: "Шымкент · Бейбітшілік 14/1", ru: "Шымкент · Бейбитшилик 14/1", en: "Shymkent · Beybitshilik 14/1" },
     pretitle: { kk: "Сенім орталығы", ru: "Центр Сенім", en: "Senim centre" },
-    line1: { kk: "Сіздің балаңыз —", ru: "Ваш ребёнок —", en: "Your child is" },
+    /** Three-line headline with mixed weights. The middle line is the
+        anchor word that gets a gradient — peach→blue. */
+    line1Before: { kk: "Сіздің ", ru: "Ваш ", en: "Your " },
+    line1Word: { kk: "балаңыз", ru: "ребёнок", en: "child" },
+    line1After: { kk: " —", ru: " —", en: " is" },
     line2: { kk: "біздің ең басты", ru: "наша самая", en: "our most" },
     line3: { kk: "жұмысымыз.", ru: "важная работа.", en: "important work." },
     sub: {
@@ -182,6 +190,11 @@ const COPY = {
       en: "We respond within an hour during working hours. Programme and price are agreed after the initial consultation.",
     },
   },
+  marquee: {
+    kk: ["Шымкент", "8+ жыл тәжірибе", "11 бағдарлама", "3 тілде", "ABA", "Логопед", "Дефектолог", "Сенсорика", "Нейропсихолог"],
+    ru: ["Шымкент", "8+ лет опыта", "11 программ", "3 языка", "ABA", "Логопед", "Дефектолог", "Сенсорика", "Нейропсихолог"],
+    en: ["Shymkent", "8+ years", "11 programmes", "3 languages", "ABA", "Speech", "Special-needs", "Sensory", "Neuropsychology"],
+  },
 };
 
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
@@ -214,12 +227,16 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     <main id="main">
       <JsonLd contacts={contacts} locale={loc} />
 
-      {/* ═══════════════ HERO — editorial, full-bleed ═══════════════ */}
+      {/* ═══════════════ HERO — editorial, full-bleed, mesh background ═══════════════ */}
       <section className="relative overflow-hidden">
-        {/* Soft warm glow background */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[820px] bg-gradient-to-b from-accent/30 via-background to-background" />
-        <div className="pointer-events-none absolute -right-32 -top-20 -z-10 h-[36rem] w-[36rem] rounded-full bg-accent/40 blur-3xl float-soft" />
-        <div className="pointer-events-none absolute -left-32 top-72 -z-10 h-[24rem] w-[24rem] rounded-full bg-primary-soft/60 blur-3xl float-soft" style={{ animationDelay: "-3s" }} />
+        {/* Mesh-style colour wash + breathing blobs that morph their shape */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[860px] mesh-bg" />
+        <div className="pointer-events-none absolute -right-40 -top-32 -z-10 h-[36rem] w-[36rem] bg-accent/45 blur-3xl morph-soft" />
+        <div className="pointer-events-none absolute -left-32 top-80 -z-10 h-[26rem] w-[26rem] bg-primary-soft/70 blur-3xl morph-soft" style={{ animationDelay: "-4s" }} />
+        {/* Floating decorative shapes */}
+        <span aria-hidden className="pointer-events-none absolute right-[8%] top-32 -z-10 hidden h-3 w-3 rounded-full bg-accent-foreground/30 md:block float-soft" />
+        <span aria-hidden className="pointer-events-none absolute left-[12%] bottom-40 -z-10 hidden h-2 w-2 rotate-45 bg-primary/40 md:block float-soft" style={{ animationDelay: "-2s" }} />
+        <span aria-hidden className="pointer-events-none absolute right-[20%] bottom-20 -z-10 hidden h-1.5 w-1.5 rounded-full bg-success/60 md:block float-soft" style={{ animationDelay: "-5s" }} />
 
         <Container className="relative pt-12 md:pt-20 lg:pt-28">
           <div className="reveal flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
@@ -232,14 +249,19 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           </div>
 
           {heroOverrideTitle ? (
-            <h1 className="reveal mt-12 max-w-[18ch] font-display text-[2.8rem] font-semibold leading-[1.02] tracking-tight md:text-[5rem] lg:text-[6.5rem]">
+            <h1 className="reveal hero-parallax mt-12 max-w-[18ch] font-display text-[2.8rem] font-semibold leading-[1.02] tracking-tight md:text-[5rem] lg:text-[6.5rem]">
               {heroOverrideTitle}
             </h1>
           ) : (
-            <h1 className="reveal mt-12 font-display text-[2.8rem] font-semibold leading-[1.02] tracking-tight md:text-[5rem] lg:text-[6.5rem]">
-              <span className="block">{COPY.hero.line1[loc]}</span>
-              <span className="block text-muted-foreground/55">{COPY.hero.line2[loc]}</span>
-              <span className="block">{COPY.hero.line3[loc]}</span>
+            <h1 className="reveal hero-parallax mt-12 font-display text-[2.8rem] leading-[1.02] tracking-tight md:text-[5rem] lg:text-[6.5rem]">
+              {/* Mixed weights + gradient anchor word */}
+              <span className="block font-medium">
+                {COPY.hero.line1Before[loc]}
+                <span className="font-bold text-gradient">{COPY.hero.line1Word[loc]}</span>
+                {COPY.hero.line1After[loc]}
+              </span>
+              <span className="block font-light text-muted-foreground/65">{COPY.hero.line2[loc]}</span>
+              <span className="block font-extrabold">{COPY.hero.line3[loc]}</span>
             </h1>
           )}
 
@@ -270,6 +292,9 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         </Container>
       </section>
 
+      {/* ═══════════════ MARQUEE — fast-scanning credentials strip ═══════════════ */}
+      <Marquee items={COPY.marquee[loc]} />
+
       {/* ═══════════════ TRUST BAR ═══════════════ */}
       <section className="border-y border-border/50 bg-card">
         <Container>
@@ -290,12 +315,11 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       </section>
 
       {/* ═══════════════ AUDIENCE — big-type manifesto ═══════════════ */}
-      <section className="py-28 md:py-36">
+      <section className="relative overflow-hidden py-28 md:py-36">
+        <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 dot-pattern opacity-60" />
         <Container>
-          <div className="reveal max-w-2xl space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-              {COPY.audience.eyebrow[loc]}
-            </p>
+          <div className="reveal max-w-2xl space-y-4">
+            <SectionLabel number="01">{COPY.audience.eyebrow[loc]}</SectionLabel>
             <p className="font-display text-2xl font-medium leading-snug text-muted-foreground md:text-3xl">
               {COPY.audience.headline[loc]}
             </p>
@@ -318,9 +342,14 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         </Container>
       </section>
 
+      <SectionDivider />
+
       {/* ═══════════════ STATS — quietly confident numbers ═══════════════ */}
       <section className="border-y border-border/50 bg-primary-soft/30 py-20 md:py-24">
         <Container>
+          <div className="reveal mb-10 max-w-xl">
+            <SectionLabel number="02">{loc === "kk" ? "Цифрлармен" : loc === "en" ? "By the numbers" : "В цифрах"}</SectionLabel>
+          </div>
           <div className="reveal-stagger grid gap-10 md:grid-cols-3 md:gap-6">
             {stats.map((s, i) => (
               <div key={i} className="flex flex-col items-start gap-2">
@@ -341,10 +370,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       <section className="py-28 md:py-36">
         <Container>
           <div className="reveal flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
-            <div className="max-w-xl space-y-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-                {COPY.services.eyebrow[loc]}
-              </p>
+            <div className="max-w-xl space-y-4">
+              <SectionLabel number="03">{COPY.services.eyebrow[loc]}</SectionLabel>
               <h2 className="font-display text-4xl font-semibold leading-tight tracking-tight md:text-5xl">
                 {COPY.services.headline[loc]}
               </h2>
@@ -358,28 +385,24 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           {/* Asymmetric grid: first card spans 2x2, others are 1x1 → cinematic 3-column rhythm */}
           <div className="reveal-stagger mt-12 grid gap-4 md:grid-cols-3 md:grid-rows-2">
             {services.slice(0, 6).map((s, i) => (
-              <div
+              <TiltCard
                 key={s.id}
-                className={
-                  "lift " +
-                  (i === 0 ? "md:col-span-2 md:row-span-2" : "")
-                }
+                className={i === 0 ? "md:col-span-2 md:row-span-2" : ""}
               >
                 <ServiceCard service={s} locale={loc} />
-              </div>
+              </TiltCard>
             ))}
           </div>
         </Container>
       </section>
 
       {/* ═══════════════ PROCESS — vertical timeline ═══════════════ */}
-      <section className="bg-secondary/40 py-28 md:py-36">
-        <Container>
+      <section className="relative bg-secondary/40 py-28 md:py-36">
+        <div aria-hidden className="pointer-events-none absolute inset-0 dot-pattern opacity-40" />
+        <Container className="relative">
           <div className="reveal grid gap-10 lg:grid-cols-[1fr_2fr] lg:items-start">
-            <div className="space-y-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-                {COPY.process.eyebrow[loc]}
-              </p>
+            <div className="space-y-4">
+              <SectionLabel number="04">{COPY.process.eyebrow[loc]}</SectionLabel>
               <h2 className="font-display text-4xl font-semibold leading-tight tracking-tight md:text-5xl">
                 {COPY.process.headline[loc]}
               </h2>
@@ -404,18 +427,25 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         </Container>
       </section>
 
-      {/* ═══════════════ PHILOSOPHY — single quote, full-bleed ═══════════════ */}
+      <SectionDivider />
+
+      {/* ═══════════════ PHILOSOPHY — drop-cap quote, full-bleed ═══════════════ */}
       <section className="relative overflow-hidden py-28 md:py-36">
-        <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-background via-accent/15 to-background" />
-        <Container className="max-w-4xl text-center">
-          <p className="reveal font-display text-3xl font-medium leading-[1.25] tracking-tight text-foreground md:text-5xl">
-            <span className="text-accent-foreground/40">“</span>
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-background via-accent/20 to-background" />
+        {/* Massive decorative quotation mark */}
+        <span aria-hidden className="pointer-events-none absolute left-4 top-10 -z-10 select-none font-display text-[14rem] font-bold leading-none text-accent-foreground/10 md:text-[22rem]">
+          “
+        </span>
+        <Container className="max-w-4xl">
+          <div className="reveal mb-8">
+            <SectionLabel number="05">{loc === "kk" ? "Біздің ұстанымымыз" : loc === "en" ? "Our philosophy" : "Наша философия"}</SectionLabel>
+          </div>
+          <p className="reveal drop-cap font-display text-3xl font-medium leading-[1.3] tracking-tight text-foreground md:text-[2.7rem]">
             {COPY.philosophy.quoteParts[loc].before}
             <span className="underline-grow">{COPY.philosophy.quoteParts[loc].highlight}</span>
             {COPY.philosophy.quoteParts[loc].after}
-            <span className="text-accent-foreground/40">”</span>
           </p>
-          <p className="reveal mt-8 text-sm uppercase tracking-[0.2em] text-muted-foreground">
+          <p className="reveal mt-10 text-sm uppercase tracking-[0.2em] text-muted-foreground">
             {COPY.philosophy.sign[loc]}
           </p>
         </Container>
@@ -425,9 +455,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       <section id="apply" className="border-t border-border/60 bg-secondary/40 py-24 md:py-32">
         <Container className="grid gap-12 lg:grid-cols-[1.1fr_1fr] lg:items-start lg:gap-20">
           <div className="reveal space-y-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-              {tCta("apply")}
-            </p>
+            <SectionLabel number="06">{tCta("apply")}</SectionLabel>
             <h2 className="font-display text-4xl font-semibold leading-[1.05] tracking-tight md:text-6xl">
               {COPY.finalCta.headline[loc]}
             </h2>
