@@ -7,6 +7,7 @@ import { SectionTitle } from "@/components/site/SectionTitle";
 import { ServiceCard } from "@/components/site/ServiceCard";
 import { listServices } from "@/lib/db/queries";
 import { buildMetadata } from "@/lib/seo";
+import { Breadcrumbs } from "@/components/site/Breadcrumbs";
 import type { Locale } from "@/lib/i18n/config";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
@@ -28,6 +29,14 @@ export default async function ServicesPage({ params }: { params: Promise<{ local
 
   return (
     <main id="main">
+      <div className="container py-4">
+        <Breadcrumbs
+          items={[
+            { href: "/", label: loc === "kk" ? "Басты бет" : loc === "en" ? "Home" : "Главная" },
+            { label: loc === "kk" ? "Қызметтер" : loc === "en" ? "Services" : "Услуги" },
+          ]}
+        />
+      </div>
       {/* HERO with photo banner */}
       <section className="relative overflow-hidden">
         <div className="relative h-[40vh] min-h-[280px] w-full overflow-hidden">

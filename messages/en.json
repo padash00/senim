@@ -42,7 +42,8 @@
       "phone": "Please enter a valid phone number",
       "consent": "Consent is required to continue",
       "generic": "Something went wrong. Please try again."
-    }
+    },
+    "draftSaved": "saved"
   },
   "common": {
     "loading": "Loading…",

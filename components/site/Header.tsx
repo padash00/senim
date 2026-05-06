@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Menu, X } from "lucide-react";
 import { Link, usePathname } from "@/lib/i18n/navigation";
@@ -25,10 +25,29 @@ export function Header({ tagline }: { tagline?: string }) {
   const tCta = useTranslations("cta");
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 32);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
-    <header className="sticky top-0 z-30 border-b border-border/60 bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70">
-      <div className="container flex h-16 items-center gap-4 lg:h-20">
+    <header
+      className={cn(
+        "sticky top-0 z-30 border-b border-border/60 bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70",
+        "transition-shadow duration-200",
+        scrolled && "shadow-soft",
+      )}
+    >
+      <div
+        className={cn(
+          "container flex items-center gap-4 transition-[height] duration-200",
+          scrolled ? "h-14 lg:h-16" : "h-16 lg:h-20",
+        )}
+      >
         <Link href="/" className="shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-full">
           <Logo tagline={tagline} />
         </Link>

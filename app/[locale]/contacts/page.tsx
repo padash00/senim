@@ -12,6 +12,7 @@ import { getContacts } from "@/lib/db/queries";
 import { tField } from "@/lib/i18n/translated";
 import { buildMetadata } from "@/lib/seo";
 import { sanitizeIframe } from "@/lib/sanitize";
+import { Breadcrumbs } from "@/components/site/Breadcrumbs";
 import { formatPhoneHref, formatWhatsAppHref } from "@/lib/utils";
 import type { Locale } from "@/lib/i18n/config";
 import { env } from "@/lib/env";
@@ -43,6 +44,14 @@ export default async function ContactsPage({ params }: { params: Promise<{ local
   return (
     <main id="main">
       <JsonLd contacts={contacts} locale={loc} />
+      <div className="container py-4">
+        <Breadcrumbs
+          items={[
+            { href: "/", label: loc === "kk" ? "Басты бет" : loc === "en" ? "Home" : "Главная" },
+            { label: loc === "kk" ? "Байланыс" : loc === "en" ? "Contacts" : "Контакты" },
+          ]}
+        />
+      </div>
 
       {/* HERO with photo banner */}
       <section className="relative overflow-hidden">

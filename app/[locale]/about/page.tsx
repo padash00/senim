@@ -10,6 +10,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { listCertificates, listGallery, listSpecialists } from "@/lib/db/queries";
 import { tField } from "@/lib/i18n/translated";
 import { buildMetadata } from "@/lib/seo";
+import { Breadcrumbs } from "@/components/site/Breadcrumbs";
+import { FounderNote } from "@/components/site/FounderNote";
+import { DayTimeline } from "@/components/site/DayTimeline";
+import { Stamp } from "@/components/site/Stamp";
 import type { Locale } from "@/lib/i18n/config";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
@@ -63,6 +67,14 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
 
   return (
     <main id="main">
+      <div className="container py-4">
+        <Breadcrumbs
+          items={[
+            { href: "/", label: loc === "kk" ? "Басты бет" : loc === "en" ? "Home" : "Главная" },
+            { label: loc === "kk" ? "Орталық туралы" : loc === "en" ? "About" : "О центре" },
+          ]}
+        />
+      </div>
       {/* HERO with full-bleed photo banner */}
       <section className="relative overflow-hidden">
         <div className="relative h-[44vh] min-h-[320px] w-full overflow-hidden">
@@ -198,6 +210,35 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
           </Container>
         </Section>
       )}
+
+      {/* FOUNDER NOTE */}
+      <FounderNote locale={loc} />
+
+      {/* DAY IN THE CENTRE */}
+      <Section>
+        <Container className="grid gap-10 lg:grid-cols-[1fr_2fr] lg:items-start">
+          <div className="space-y-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+              {loc === "kk" ? "Бір күн" : loc === "en" ? "A day" : "Один день"}
+            </p>
+            <h2 className="font-display text-3xl font-semibold leading-tight tracking-tight md:text-4xl">
+              {loc === "kk" ? "Орталықта бір күн" : loc === "en" ? "A day at the centre" : "Один день в центре"}
+            </h2>
+            <p className="text-base leading-relaxed text-muted-foreground">
+              {loc === "kk"
+                ? "Кесте икемді — әр баланың ыңғайына сай."
+                : loc === "en"
+                  ? "The schedule is flexible — built around each child."
+                  : "Расписание гибкое — подстраивается под ребёнка."}
+            </p>
+            {/* Decorative seal */}
+            <div className="hidden pt-4 lg:block">
+              <Stamp size={140} />
+            </div>
+          </div>
+          <DayTimeline locale={loc} />
+        </Container>
+      </Section>
 
       {/* TEAM */}
       {specialists.length > 0 && (

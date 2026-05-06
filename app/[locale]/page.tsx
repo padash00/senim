@@ -14,6 +14,9 @@ import { SectionLabel } from "@/components/site/SectionLabel";
 import { SectionDivider } from "@/components/site/SectionDivider";
 import { TiltCard } from "@/components/site/TiltCard";
 import { HeroArt } from "@/components/site/HeroArt";
+import { BentoGrid } from "@/components/site/BentoGrid";
+import { TrustBadges } from "@/components/site/TrustBadges";
+import { HeroLetterReveal } from "@/components/site/HeroLetterReveal";
 import Image from "next/image";
 import {
   getContacts,
@@ -256,17 +259,17 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             <div>
               {heroOverrideTitle ? (
                 <h1 className="reveal max-w-[18ch] font-display text-[2.8rem] font-semibold leading-[1.02] tracking-tight md:text-[4.6rem] lg:text-[5.6rem]">
-                  {heroOverrideTitle}
+                  <HeroLetterReveal>{heroOverrideTitle}</HeroLetterReveal>
                 </h1>
               ) : (
                 <h1 className="reveal font-display text-[2.8rem] leading-[1.02] tracking-tight md:text-[4.6rem] lg:text-[5.6rem]">
-                  <span className="block font-medium">
+                  <HeroLetterReveal className="block font-medium">
                     {COPY.hero.line1Before[loc]}
                     <span className="font-bold text-gradient">{COPY.hero.line1Word[loc]}</span>
                     {COPY.hero.line1After[loc]}
-                  </span>
-                  <span className="block font-light text-muted-foreground/65">{COPY.hero.line2[loc]}</span>
-                  <span className="block font-extrabold">{COPY.hero.line3[loc]}</span>
+                  </HeroLetterReveal>
+                  <HeroLetterReveal className="block font-light text-muted-foreground/65">{COPY.hero.line2[loc]}</HeroLetterReveal>
+                  <HeroLetterReveal className="block font-extrabold">{COPY.hero.line3[loc]}</HeroLetterReveal>
                 </h1>
               )}
 
@@ -320,6 +323,10 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
               </div>
             ))}
           </div>
+          {/* Compact trust badges row right under the trust bar */}
+          <div className="reveal border-t border-border/40 py-5">
+            <TrustBadges locale={loc} />
+          </div>
         </Container>
       </section>
 
@@ -371,6 +378,21 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                 </span>
               </div>
             ))}
+          </div>
+        </Container>
+      </section>
+
+      {/* ═══════════════ INSIDE THE CENTRE — Bento grid ═══════════════ */}
+      <section className="py-24 md:py-32">
+        <Container>
+          <div className="reveal mb-10 max-w-xl space-y-4">
+            <SectionLabel number="·">{loc === "kk" ? "Орталық ішінде" : loc === "en" ? "Inside the centre" : "Что внутри центра"}</SectionLabel>
+            <p className="font-display text-2xl font-medium leading-snug text-muted-foreground md:text-3xl">
+              {loc === "kk" ? "Бір қарауда — біздің жұмысымыз туралы." : loc === "en" ? "Our work — at a glance." : "Наша работа — одним взглядом."}
+            </p>
+          </div>
+          <div className="reveal">
+            <BentoGrid locale={loc} />
           </div>
         </Container>
       </section>

@@ -405,9 +405,41 @@
  * --------------------------------------------------------------------------*/
 /* Hide the floating WhatsApp bubble on mobile when an application form is on
    the page. The form has its own inline buttons. */
+/* Anchor scroll offset — sticky header is 64–80px tall; this stops headings
+   from sliding under it when the user clicks an in-page link like #apply. */
+[id] {
+  scroll-margin-top: 96px;
+}
+
+/* Brand pattern — barely-there repeating dot grid for occasional accents. */
+.brand-pattern {
+  background-image:
+    radial-gradient(circle at 8px 8px, hsl(var(--accent-foreground) / 0.06) 1px, transparent 0),
+    radial-gradient(circle at 32px 32px, hsl(var(--primary) / 0.05) 1.5px, transparent 0);
+  background-size: 48px 48px, 48px 48px;
+}
+
+/* Page corner ornaments (decorative crosses).
+   Add `corner-marks` to a section that should have them. */
+.corner-marks::before,
+.corner-marks::after {
+  content: "+";
+  position: absolute;
+  font-family: var(--font-display);
+  color: hsl(var(--accent-foreground) / 0.25);
+  font-size: 22px;
+  pointer-events: none;
+}
+.corner-marks::before { top: 14px; left: 14px; }
+.corner-marks::after  { top: 14px; right: 14px; }
+
 @media (max-width: 767px) {
   body:has(main [data-application-form]) [data-floating-wa],
   body:has(main [data-application-form]) [data-mobile-cta] {
+    display: none;
+  }
+  /* Hide back-to-top on mobile when sticky CTA is shown */
+  body:has([data-mobile-cta]) [data-back-to-top] {
     display: none;
   }
   /* Reserve space at the bottom so the sticky CTA never covers the footer. */

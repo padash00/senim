@@ -13,6 +13,9 @@ import { Badge } from "@/components/ui/badge";
 import { getContacts, getServiceBySlug, listServices } from "@/lib/db/queries";
 import { tField } from "@/lib/i18n/translated";
 import { buildMetadata } from "@/lib/seo";
+import { Breadcrumbs } from "@/components/site/Breadcrumbs";
+import { ShareButton } from "@/components/site/ShareButton";
+import { RelatedServices } from "@/components/site/RelatedServices";
 import type { Locale } from "@/lib/i18n/config";
 import { env } from "@/lib/env";
 
@@ -58,7 +61,16 @@ export default async function ServiceDetailPage({ params }: Props) {
 
   return (
     <main id="main">
-      <Section bleed="primary-soft" className="pt-12 md:pt-20">
+      <div className="container py-4">
+        <Breadcrumbs
+          items={[
+            { href: "/", label: loc === "kk" ? "Басты бет" : loc === "en" ? "Home" : "Главная" },
+            { href: "/services", label: loc === "kk" ? "Қызметтер" : loc === "en" ? "Services" : "Услуги" },
+            { label: title },
+          ]}
+        />
+      </div>
+      <Section bleed="primary-soft" className="pt-6 md:pt-10">
         <Container className="grid gap-10 lg:grid-cols-[1.3fr_1fr] lg:items-center">
           <div className="space-y-5">
             <div className="flex flex-wrap items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground">
@@ -70,11 +82,12 @@ export default async function ServiceDetailPage({ params }: Props) {
               {title}
             </h1>
             {short && <p className="max-w-2xl text-lg text-muted-foreground">{short}</p>}
-            <div className="flex flex-col gap-3 sm:flex-row">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <CTAButton href={`/contacts#apply`} size="lg" showArrow>
                 Оставить заявку
               </CTAButton>
               <WhatsAppButton phone={whatsapp} label="WhatsApp" variant="outline" size="lg" />
+              <ShareButton title={title} className="ml-auto" />
             </div>
           </div>
           {(() => {
@@ -143,7 +156,7 @@ export default async function ServiceDetailPage({ params }: Props) {
             </Card>
           </div>
 
-          <aside className="space-y-6">
+          <aside className="space-y-6 lg:sticky lg:top-24 lg:self-start">
             <Card>
               <CardContent className="space-y-4 p-6">
                 <h3 className="font-display text-lg font-semibold">Кратко</h3>
@@ -173,6 +186,8 @@ export default async function ServiceDetailPage({ params }: Props) {
           </aside>
         </Container>
       </Section>
+
+      <RelatedServices currentSlug={slug} locale={loc} />
     </main>
   );
 }

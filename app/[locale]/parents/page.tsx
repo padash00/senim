@@ -9,6 +9,7 @@ import { FaqAccordion } from "@/components/site/FaqAccordion";
 import { Card, CardContent } from "@/components/ui/card";
 import { listFaqs } from "@/lib/db/queries";
 import { buildMetadata } from "@/lib/seo";
+import { Breadcrumbs } from "@/components/site/Breadcrumbs";
 import type { Locale } from "@/lib/i18n/config";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
@@ -93,6 +94,14 @@ export default async function ParentsPage({ params }: { params: Promise<{ locale
 
   return (
     <main id="main">
+      <div className="container py-4">
+        <Breadcrumbs
+          items={[
+            { href: "/", label: loc === "kk" ? "Басты бет" : loc === "en" ? "Home" : "Главная" },
+            { label: loc === "kk" ? "Ата-аналарға" : loc === "en" ? "For parents" : "Для родителей" },
+          ]}
+        />
+      </div>
       {/* HERO with photo banner */}
       <section className="relative overflow-hidden">
         <div className="relative h-[40vh] min-h-[280px] w-full overflow-hidden">

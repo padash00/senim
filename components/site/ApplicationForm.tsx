@@ -22,6 +22,7 @@ import { WhatsAppButton } from "./WhatsAppButton";
 import { applicationSchema, type ApplicationInput } from "@/lib/validators/application";
 import { submitApplication } from "@/app/actions/application";
 import type { Locale } from "@/lib/i18n/config";
+import { cn } from "@/lib/utils";
 
 type Props = {
   whatsappNumber?: string;
@@ -93,7 +94,16 @@ export function ApplicationForm({
   const preferredContact = watch("preferred_contact");
   const preferredLanguage = watch("preferred_language");
   const phoneValue = watch("phone");
+  const nameValue = watch("parent_name");
+  const consentValue = watch("consent");
   const phoneOk = phoneValue && !errors.phone && phoneValue.replace(/\D/g, "").length >= 10;
+  const nameOk = nameValue && !errors.parent_name && nameValue.trim().length >= 2;
+  const consentOk = consentValue === true;
+
+  // Visual progress 0..1 over the three required fields.
+  const filled = [nameOk, phoneOk, consentOk].filter(Boolean).length;
+  const progress = filled / 3;
+  const [savedFlash, setSavedFlash] = useState(false);
 
   // Load draft once on mount.
   useEffect(() => {
@@ -112,8 +122,9 @@ export function ApplicationForm({
     }
   }, [setValue]);
 
-  // Save draft on every change (debounced via setTimeout chain).
+  // Save draft on every change.
   useEffect(() => {
+    let flashT: number;
     const sub = watch((values) => {
       try {
         const draft: Draft = {
@@ -123,11 +134,17 @@ export function ApplicationForm({
           child_age: values.child_age,
         };
         localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+        setSavedFlash(true);
+        window.clearTimeout(flashT);
+        flashT = window.setTimeout(() => setSavedFlash(false), 1200);
       } catch {
         /* storage full / blocked */
       }
     });
-    return () => sub.unsubscribe();
+    return () => {
+      sub.unsubscribe();
+      window.clearTimeout(flashT);
+    };
   }, [watch]);
 
   const phoneReg = register("phone");
@@ -175,9 +192,31 @@ export function ApplicationForm({
 
   return (
     <Card className={className} data-application-form>
+      {/* Visual progress bar at the very top of the form card */}
+      <div className="h-1 w-full overflow-hidden rounded-t-2xl bg-muted">
+        <div
+          className="h-full bg-gradient-to-r from-primary to-accent-foreground transition-[width] duration-500 ease-out"
+          style={{ width: `${Math.round(progress * 100)}%` }}
+          aria-hidden
+        />
+      </div>
       <CardHeader>
-        <CardTitle>{t("title")}</CardTitle>
-        <CardDescription>{t("subtitle")}</CardDescription>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <CardTitle>{t("title")}</CardTitle>
+            <CardDescription>{t("subtitle")}</CardDescription>
+          </div>
+          {/* Auto-saved indicator — fades in on every keystroke */}
+          <span
+            aria-live="polite"
+            className={cn(
+              "shrink-0 rounded-full bg-success/10 px-2 py-1 text-[10px] font-medium uppercase tracking-wider text-success transition-opacity duration-300",
+              savedFlash ? "opacity-100" : "opacity-0",
+            )}
+          >
+            ↻ {t("draftSaved")}
+          </span>
+        </div>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-5">
@@ -191,7 +230,21 @@ export function ApplicationForm({
 
           <div className="grid gap-2">
             <Label htmlFor="parent_name">{t("parentName")} *</Label>
-            <Input id="parent_name" autoComplete="name" {...register("parent_name")} aria-invalid={!!errors.parent_name} />
+            <div className="relative">
+              <Input
+                id="parent_name"
+                autoComplete="name"
+                {...register("parent_name")}
+                aria-invalid={!!errors.parent_name}
+                className={nameOk ? "border-success/60 focus-visible:ring-success" : undefined}
+              />
+              {nameOk && (
+                <span aria-hidden className="absolute right-3 top-1/2 -translate-y-1/2 text-success">✓</span>
+              )}
+              {errors.parent_name && (
+                <span aria-hidden className="absolute right-3 top-1/2 -translate-y-1/2 text-destructive">✗</span>
+              )}
+            </div>
             {errors.parent_name && <FieldError msgKey={errors.parent_name.message} />}
           </div>
 
