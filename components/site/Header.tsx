@@ -7,6 +7,7 @@ import { Link, usePathname } from "@/lib/i18n/navigation";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { Logo } from "./Logo";
 import { CTAButton } from "./CTAButton";
+import { ThemeToggle } from "./ThemeToggle";
 import { cn } from "@/lib/utils";
 
 // Compressed nav: 4 entry points instead of 8. Keeps the header airy and
@@ -39,9 +40,10 @@ export function Header({ tagline }: { tagline?: string }) {
               <Link
                 key={href}
                 href={href}
+                data-active={active}
                 className={cn(
-                  "rounded-full px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground",
-                  active && "bg-secondary text-foreground",
+                  "nav-link rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground",
+                  active && "text-foreground",
                 )}
               >
                 {t(key)}
@@ -51,6 +53,7 @@ export function Header({ tagline }: { tagline?: string }) {
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
+          <ThemeToggle className="hidden sm:inline-flex" />
           <LanguageSwitcher />
           <CTAButton href="/contacts#apply" size="sm" className="hidden md:inline-flex">
             {tCta("apply")}

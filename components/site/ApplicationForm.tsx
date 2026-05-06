@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocale, useTranslations } from "next-intl";
-import { CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -33,6 +32,28 @@ type Props = {
   className?: string;
 };
 
+const DRAFT_KEY = "senim-form-draft";
+type Draft = Partial<Pick<ApplicationInput, "parent_name" | "phone" | "comment" | "child_age">>;
+
+/** Smart Kazakh phone formatter: '7700...' → '+7 700 000 00 00'. */
+function formatKzPhone(raw: string): string {
+  const digits = raw.replace(/\D/g, "").slice(0, 11);
+  if (!digits) return "";
+  let normalized = digits;
+  if (normalized.startsWith("8")) normalized = "7" + normalized.slice(1);
+  if (!normalized.startsWith("7")) normalized = "7" + normalized;
+  const a = normalized.slice(1, 4);
+  const b = normalized.slice(4, 7);
+  const c = normalized.slice(7, 9);
+  const d = normalized.slice(9, 11);
+  let out = "+7";
+  if (a) out += " " + a;
+  if (b) out += " " + b;
+  if (c) out += " " + c;
+  if (d) out += " " + d;
+  return out;
+}
+
 export function ApplicationForm({
   whatsappNumber,
   serviceId,
@@ -46,16 +67,18 @@ export function ApplicationForm({
   const locale = useLocale() as Locale;
   const [isPending, startTransition] = useTransition();
   const [done, setDone] = useState<{ name: string; phone: string; comment?: string } | null>(null);
+  const draftLoaded = useRef(false);
 
   const {
     register,
     handleSubmit,
     setValue,
     watch,
-    formState: { errors },
+    formState: { errors, isValid },
     reset,
   } = useForm<ApplicationInput>({
     resolver: zodResolver(applicationSchema),
+    mode: "onChange", // real-time validation → green/red as the parent types
     defaultValues: {
       preferred_contact: "whatsapp",
       preferred_language: defaultLanguage ?? locale,
@@ -69,6 +92,45 @@ export function ApplicationForm({
 
   const preferredContact = watch("preferred_contact");
   const preferredLanguage = watch("preferred_language");
+  const phoneValue = watch("phone");
+  const phoneOk = phoneValue && !errors.phone && phoneValue.replace(/\D/g, "").length >= 10;
+
+  // Load draft once on mount.
+  useEffect(() => {
+    if (draftLoaded.current) return;
+    draftLoaded.current = true;
+    try {
+      const raw = localStorage.getItem(DRAFT_KEY);
+      if (!raw) return;
+      const draft = JSON.parse(raw) as Draft;
+      if (draft.parent_name) setValue("parent_name", draft.parent_name);
+      if (draft.phone) setValue("phone", draft.phone);
+      if (draft.comment) setValue("comment", draft.comment);
+      if (draft.child_age != null) setValue("child_age", draft.child_age);
+    } catch {
+      /* corrupt draft — ignore */
+    }
+  }, [setValue]);
+
+  // Save draft on every change (debounced via setTimeout chain).
+  useEffect(() => {
+    const sub = watch((values) => {
+      try {
+        const draft: Draft = {
+          parent_name: values.parent_name,
+          phone: values.phone,
+          comment: values.comment,
+          child_age: values.child_age,
+        };
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+      } catch {
+        /* storage full / blocked */
+      }
+    });
+    return () => sub.unsubscribe();
+  }, [watch]);
+
+  const phoneReg = register("phone");
 
   function onSubmit(values: ApplicationInput) {
     const fd = new FormData();
@@ -86,6 +148,7 @@ export function ApplicationForm({
         toast.success(t("success"));
         setDone({ name: values.parent_name, phone: values.phone, comment: values.comment ?? "" });
         reset();
+        try { localStorage.removeItem(DRAFT_KEY); } catch { /* ignore */ }
       } else {
         toast.error(t("errors.generic"));
       }
@@ -98,8 +161,8 @@ export function ApplicationForm({
     }`;
     return (
       <Card className={className} aria-live="polite">
-        <CardContent className="flex flex-col items-center gap-4 py-12 text-center">
-          <CheckCircle2 className="h-12 w-12 text-success" />
+        <CardContent className="flex flex-col items-center gap-5 py-12 text-center">
+          <AnimatedCheck />
           <p className="text-lg font-medium">{t("success")}</p>
           {whatsappNumber && (
             <WhatsAppButton phone={whatsappNumber} message={message} label={t("successWhatsapp")} />
@@ -134,14 +197,28 @@ export function ApplicationForm({
           <div className="grid gap-2 sm:grid-cols-2">
             <div className="grid gap-2">
               <Label htmlFor="phone">{t("phone")} *</Label>
-              <Input
-                id="phone"
-                type="tel"
-                autoComplete="tel"
-                placeholder="+7 700 000 00 00"
-                {...register("phone")}
-                aria-invalid={!!errors.phone}
-              />
+              <div className="relative">
+                <Input
+                  id="phone"
+                  type="tel"
+                  autoComplete="tel"
+                  inputMode="tel"
+                  placeholder="+7 700 000 00 00"
+                  {...phoneReg}
+                  onChange={(e) => {
+                    const formatted = formatKzPhone(e.target.value);
+                    e.target.value = formatted;
+                    void phoneReg.onChange(e);
+                  }}
+                  aria-invalid={!!errors.phone}
+                  className={phoneOk ? "border-success/60 focus-visible:ring-success" : undefined}
+                />
+                {phoneOk && (
+                  <span aria-hidden className="absolute right-3 top-1/2 -translate-y-1/2 text-success">
+                    ✓
+                  </span>
+                )}
+              </div>
               {errors.phone && <FieldError msgKey={errors.phone.message} />}
             </div>
 
@@ -198,7 +275,7 @@ export function ApplicationForm({
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row">
-            <Button type="submit" size="lg" disabled={isPending} className="sm:flex-1">
+            <Button type="submit" size="lg" disabled={isPending || !isValid} className="sm:flex-1">
               {isPending ? `${tCta("send")}…` : tCta("send")}
             </Button>
             {whatsappNumber && (
@@ -206,6 +283,11 @@ export function ApplicationForm({
             )}
           </div>
         </form>
+        {!done && (
+          <p className="mt-4 text-center text-[11px] text-muted-foreground/70">
+            Введённое сохраняется автоматически — можно вернуться позже.
+          </p>
+        )}
       </CardContent>
     </Card>
   );
@@ -215,4 +297,31 @@ function FieldError({ msgKey }: { msgKey?: string }) {
   const t = useTranslations();
   if (!msgKey) return null;
   return <p className="text-xs text-destructive">{t(msgKey)}</p>;
+}
+
+/**
+ * SVG checkmark whose path is "drawn" by animating stroke-dashoffset.
+ * Pure CSS animation, no external library.
+ */
+function AnimatedCheck() {
+  return (
+    <span className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-success/15">
+      <svg viewBox="0 0 52 52" className="h-9 w-9" aria-hidden>
+        <circle cx="26" cy="26" r="24" fill="none" stroke="hsl(var(--success))" strokeWidth="2" opacity="0.3" />
+        <path
+          d="M14 27 L23 36 L39 18"
+          fill="none"
+          stroke="hsl(var(--success))"
+          strokeWidth="3.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          style={{
+            strokeDasharray: 60,
+            strokeDashoffset: 60,
+            animation: "draw-check 700ms cubic-bezier(0.65, 0, 0.45, 1) 120ms forwards",
+          }}
+        />
+      </svg>
+    </span>
+  );
 }

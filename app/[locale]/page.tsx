@@ -6,6 +6,8 @@ import { CTAButton } from "@/components/site/CTAButton";
 import { WhatsAppButton } from "@/components/site/WhatsAppButton";
 import { ServiceCard } from "@/components/site/ServiceCard";
 import { ApplicationForm } from "@/components/site/ApplicationForm";
+import { AnimatedNumber } from "@/components/site/AnimatedNumber";
+import { AudienceWord } from "@/components/site/AudienceWord";
 import { JsonLd } from "@/components/site/JsonLd";
 import {
   getContacts,
@@ -75,6 +77,40 @@ const COPY = {
       ru: ["Речь", "Внимание", "Коммуникация", "Моторика", "Сенсорика", "Поведение", "Обучение", "Самостоятельность"],
       en: ["Speech", "Attention", "Communication", "Motor skills", "Sensory", "Behaviour", "Learning", "Independence"],
     },
+    /** Concrete examples shown as a tooltip on hover/focus — helps a parent
+        recognise their situation in one second. */
+    hints: {
+      kk: [
+        "Сөйлеу кешеуілдеуі, аз сөздік қор, түсініксіз дыбыстар",
+        "Назар тұрақтамайды, тапсырманы аяғына дейін орындау қиын",
+        "Көзге қарамайды, эмоцияны түсінбейді, ойынға қосылмайды",
+        "Жүгіру, секіру, ұсақ моторика — қиындықтар",
+        "Дыбыстар, иістер, тиісулер күшті әсер етеді",
+        "Жиі айқай, ыза, өзін-өзі реттеу қиын",
+        "Әріп, сан, оқу — қиын беріледі",
+        "Киіну, тамақтану, өзіне-өзі қызмет көрсету — қажет дағдылар",
+      ],
+      ru: [
+        "Задержка речи, мало слов, нечёткое произношение",
+        "Не удерживает внимание, сложно довести задание до конца",
+        "Избегает зрительного контакта, не понимает эмоций, не включается в игру",
+        "Бег, прыжки, мелкая моторика — даются с трудом",
+        "Сильно реагирует на звуки, запахи, прикосновения",
+        "Частые истерики, сложности с саморегуляцией",
+        "Буквы, цифры, чтение — даются тяжело",
+        "Одевание, еда, самообслуживание — нужно поддержать",
+      ],
+      en: [
+        "Late or limited speech, unclear pronunciation",
+        "Difficulty staying focused or finishing tasks",
+        "Avoids eye contact, struggles with emotions, hard to join play",
+        "Trouble running, jumping, fine motor skills",
+        "Strong reactions to sounds, smells, touch",
+        "Frequent meltdowns, hard to self-regulate",
+        "Letters, numbers, reading — hard going",
+        "Dressing, eating, self-care — needs support",
+      ],
+    },
     note: {
       kk: "Әр балаға — өз жолы. Бағдарлама бастапқы консультациядан кейін қалыптасады.",
       ru: "Каждому ребёнку — свой путь. Программу подбираем после первичной консультации.",
@@ -125,10 +161,12 @@ const COPY = {
     ],
   },
   philosophy: {
-    quote: {
-      kk: "Біз балаларды «емдемейміз». Біз олардың дамуына көмектесеміз. Әрбір бала — жол. Әрбір отбасы — команда.",
-      ru: "Мы не «лечим» детей. Мы помогаем им расти. Каждый ребёнок — путь. Каждая семья — команда.",
-      en: "We don't \"treat\" children. We help them grow. Every child is a path. Every family is a team.",
+    /** Split into 3 chunks so we can underline the last word (`команда` /
+        `team` / `команда`) with an animated highlight. */
+    quoteParts: {
+      kk: { before: "Біз балаларды «емдемейміз». Біз олардың дамуына көмектесеміз. Әрбір бала — жол. Әрбір отбасы — ", highlight: "команда", after: "." },
+      ru: { before: "Мы не «лечим» детей. Мы помогаем им расти. Каждый ребёнок — путь. Каждая семья — ", highlight: "команда", after: "." },
+      en: { before: "We don't \"treat\" children. We help them grow. Every child is a path. Every family is a ", highlight: "team", after: "." },
     },
     sign: { kk: "— Сенім орталығы", ru: "— Центр Сенім", en: "— Senim centre" },
   },
@@ -265,8 +303,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
           <ul className="reveal mt-12 flex flex-wrap items-baseline gap-x-5 gap-y-3 font-display text-[2rem] font-semibold leading-[1.05] tracking-tight sm:gap-x-8 sm:text-[2.5rem] md:gap-x-10 md:text-[4rem] lg:text-[5rem]">
             {COPY.audience.words[loc].map((w, i) => (
-              <li key={w} className="group inline-flex items-baseline gap-3 transition-colors">
-                <span className="text-foreground transition-colors duration-300 group-hover:text-primary">{w}</span>
+              <li key={w} className="inline-flex items-baseline gap-3">
+                <AudienceWord word={w} hint={COPY.audience.hints[loc][i]} />
                 {i < COPY.audience.words[loc].length - 1 && (
                   <span aria-hidden className="text-xl text-accent-foreground/30 sm:text-2xl md:text-4xl">·</span>
                 )}
@@ -286,9 +324,10 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           <div className="reveal-stagger grid gap-10 md:grid-cols-3 md:gap-6">
             {stats.map((s, i) => (
               <div key={i} className="flex flex-col items-start gap-2">
-                <span className="font-display text-7xl font-semibold leading-none tracking-tight text-primary md:text-8xl">
-                  {s.number}
-                </span>
+                <AnimatedNumber
+                  value={s.number}
+                  className="font-display text-7xl font-semibold leading-none tracking-tight text-primary md:text-8xl"
+                />
                 <span className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
                   {s.label[loc]}
                 </span>
@@ -371,7 +410,9 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         <Container className="max-w-4xl text-center">
           <p className="reveal font-display text-3xl font-medium leading-[1.25] tracking-tight text-foreground md:text-5xl">
             <span className="text-accent-foreground/40">“</span>
-            {COPY.philosophy.quote[loc]}
+            {COPY.philosophy.quoteParts[loc].before}
+            <span className="underline-grow">{COPY.philosophy.quoteParts[loc].highlight}</span>
+            {COPY.philosophy.quoteParts[loc].after}
             <span className="text-accent-foreground/40">”</span>
           </p>
           <p className="reveal mt-8 text-sm uppercase tracking-[0.2em] text-muted-foreground">

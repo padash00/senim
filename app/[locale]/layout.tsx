@@ -8,6 +8,7 @@ import { LOCALE_TAGLINE } from "@/lib/constants";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { WhatsAppFloating } from "@/components/site/WhatsAppButton";
+import { MobileStickyCta } from "@/components/site/MobileStickyCta";
 import { getContacts } from "@/lib/db/queries";
 import { env } from "@/lib/env";
 
@@ -44,6 +45,7 @@ export default async function LocaleLayout({ children, params }: Props) {
         <Footer locale={locale as Locale} contacts={contacts} tagline={tagline} />
       </div>
       <WhatsAppFloating phone={whatsapp} label={t("whatsapp")} />
+      <MobileStickyCta phone={contacts?.phone} whatsapp={whatsapp} />
       <Toaster richColors position="top-center" closeButton />
     </NextIntlClientProvider>
   );

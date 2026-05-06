@@ -29,10 +29,28 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+// Inline script to set the theme class before paint — eliminates the
+// dreaded "flash of light theme" on dark-mode users.
+const themeBootstrap = `
+(function(){try{
+  var k='senim-theme';
+  var saved=localStorage.getItem(k);
+  var prefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var dark = saved ? saved==='dark' : prefersDark;
+  if(dark) document.documentElement.classList.add('dark');
+}catch(e){}})();
+`;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html className={`${sans.variable} ${display.variable}`} suppressHydrationWarning>
-      <body className="min-h-screen antialiased">{children}</body>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
+      </head>
+      <body className="min-h-screen antialiased">
+        <div className="scroll-progress" aria-hidden />
+        {children}
+      </body>
     </html>
   );
 }

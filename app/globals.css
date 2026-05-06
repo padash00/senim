@@ -4,12 +4,9 @@
 
 @layer base {
   :root {
-    /* Warm, calm, medical-educational palette.
-       The peach / amber accents do most of the emotional work; blue is the
-       trust anchor. We deliberately keep the saturation low so the page
-       doesn't shout. */
-    --background: 33 50% 97%;        /* warm milk */
-    --foreground: 218 30% 15%;       /* deep ink */
+    /* Warm, calm, medical-educational palette. */
+    --background: 33 50% 97%;
+    --foreground: 218 30% 15%;
 
     --card: 0 0% 100%;
     --card-foreground: 218 30% 15%;
@@ -17,17 +14,17 @@
     --popover: 0 0% 100%;
     --popover-foreground: 218 30% 15%;
 
-    --primary: 212 64% 42%;          /* warm trust blue */
+    --primary: 212 64% 42%;
     --primary-foreground: 0 0% 100%;
     --primary-soft: 212 70% 94%;
 
-    --secondary: 30 26% 94%;         /* warm beige */
+    --secondary: 30 26% 94%;
     --secondary-foreground: 218 30% 15%;
 
     --muted: 30 22% 95%;
     --muted-foreground: 218 12% 42%;
 
-    --accent: 24 80% 88%;            /* peach accent */
+    --accent: 24 80% 88%;
     --accent-foreground: 22 50% 24%;
 
     --destructive: 0 70% 50%;
@@ -45,6 +42,44 @@
 
     --radius: 1.25rem;
   }
+
+  /* Dark theme — warm, low-saturation, ~AAA contrast on text. */
+  .dark {
+    --background: 220 25% 9%;        /* deep ink-blue */
+    --foreground: 36 30% 94%;        /* warm cream */
+
+    --card: 220 24% 12%;
+    --card-foreground: 36 30% 94%;
+
+    --popover: 220 24% 12%;
+    --popover-foreground: 36 30% 94%;
+
+    --primary: 212 70% 65%;          /* lighter blue for contrast on dark */
+    --primary-foreground: 220 25% 9%;
+    --primary-soft: 212 40% 22%;
+
+    --secondary: 220 18% 16%;
+    --secondary-foreground: 36 30% 94%;
+
+    --muted: 220 18% 14%;
+    --muted-foreground: 36 12% 65%;
+
+    --accent: 24 50% 28%;            /* muted peach */
+    --accent-foreground: 24 80% 88%;
+
+    --destructive: 0 70% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 152 50% 50%;
+    --success-foreground: 220 25% 9%;
+
+    --warning: 36 90% 60%;
+    --warning-foreground: 36 90% 12%;
+
+    --border: 220 18% 20%;
+    --input: 220 18% 20%;
+    --ring: 212 70% 65%;
+  }
 }
 
 @layer base {
@@ -55,10 +90,21 @@
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     scroll-behavior: smooth;
+    color-scheme: light;
+  }
+  html.dark {
+    color-scheme: dark;
   }
   body {
     @apply bg-background text-foreground font-sans;
     font-feature-settings: "ss01", "cv11";
+    /* Film grain — extremely subtle SVG noise that breaks the AI-flat feel.
+       The data-uri is an inline SVG turbulence pattern. */
+    background-image:
+      radial-gradient(at 20% 0%, hsl(var(--accent) / 0.08) 0%, transparent 50%),
+      radial-gradient(at 80% 100%, hsl(var(--primary-soft) / 0.15) 0%, transparent 50%),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n' x='0' y='0'><feTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.04 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    background-attachment: fixed, fixed, local;
   }
   ::selection {
     background: hsl(var(--accent));
@@ -85,7 +131,6 @@
   .container-prose {
     @apply container max-w-3xl;
   }
-  /* Soft 3D lift for content cards on hover. */
   .lift {
     transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
                 box-shadow 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -96,48 +141,67 @@
     box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04),
                 0 18px 40px -16px rgba(15, 23, 42, 0.16);
   }
+  /* Animated underline on the active nav link. */
+  .nav-link {
+    position: relative;
+  }
+  .nav-link[data-active="true"]::after {
+    content: "";
+    position: absolute;
+    left: 1rem;
+    right: 1rem;
+    bottom: 6px;
+    height: 2px;
+    border-radius: 2px;
+    background: hsl(var(--primary));
+    animation: nav-underline 320ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+  /* Quote highlight underline (philosophy section) */
+  .underline-grow {
+    background: linear-gradient(transparent 60%, hsl(var(--accent)) 60%);
+    background-size: 0% 100%;
+    background-repeat: no-repeat;
+    animation: underline-grow 1100ms cubic-bezier(0.16, 1, 0.3, 1) 220ms forwards;
+  }
 }
 
 /* ----------------------------------------------------------------------------
- * Scroll-reveal animations.
- *
- * No JavaScript: we use CSS animation-timeline: view() — supported in modern
- * Chromium / Edge. In other browsers the elements are simply visible
- * (opacity:1 fallback), so it degrades gracefully.
+ * Animations
  * --------------------------------------------------------------------------*/
 @keyframes reveal-up {
-  from {
-    opacity: 0;
-    transform: translateY(28px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-
 @keyframes reveal-fade {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
-
 @keyframes float-soft {
   0%, 100% { transform: translateY(0) rotate(0deg); }
   50%      { transform: translateY(-10px) rotate(0.4deg); }
 }
-
 @keyframes pulse-ring {
   0%, 100% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0.35); }
   50%      { box-shadow: 0 0 0 12px hsl(var(--primary) / 0); }
 }
+@keyframes nav-underline {
+  from { transform: scaleX(0); transform-origin: left; }
+  to   { transform: scaleX(1); transform-origin: left; }
+}
+@keyframes underline-grow {
+  from { background-size: 0% 100%; }
+  to   { background-size: 100% 100%; }
+}
+@keyframes draw-check {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes scroll-progress {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
 
 @layer utilities {
-  /* Initial state for revealed elements — invisible until view scrolls them in.
-     Browsers that don't support animation-timeline will see opacity:1 because
-     the @supports block flips it. */
-  .reveal {
-    opacity: 1;
-  }
+  .reveal { opacity: 1; }
 
   @supports (animation-timeline: view()) {
     .reveal {
@@ -152,8 +216,6 @@
       animation-timeline: view();
       animation-range: entry 0% cover 30%;
     }
-    /* Stagger children with delay step. Use inside grids: each child gets
-       progressively delayed. */
     .reveal-stagger > * {
       opacity: 0;
       animation: reveal-up 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -171,13 +233,52 @@
 
   .float-soft { animation: float-soft 7s ease-in-out infinite; }
   .pulse-ring { animation: pulse-ring 2.4s ease-out infinite; }
+
+  /* Scroll-progress bar at the top of the viewport. Pure CSS via
+     scroll-timeline — no JS, no rerenders. Falls back to invisible. */
+  .scroll-progress {
+    position: fixed;
+    inset: 0 0 auto 0;
+    height: 3px;
+    transform-origin: left;
+    background: linear-gradient(90deg, hsl(var(--primary)), hsl(var(--accent-foreground)));
+    z-index: 50;
+    pointer-events: none;
+    transform: scaleX(0);
+  }
+  @supports (animation-timeline: scroll()) {
+    .scroll-progress {
+      animation: scroll-progress linear both;
+      animation-timeline: scroll(root);
+    }
+  }
 }
 
-/* Mobile: hide the floating WhatsApp bubble when an application form is on
-   the page — the form already has its own submit + WhatsApp buttons inline,
-   and the bubble would sit on top of them. Desktop keeps the bubble. */
+/* ----------------------------------------------------------------------------
+ * View transitions — smooth cross-page animation (Chrome 111+, Safari 18+).
+ * Falls back to instant navigation everywhere else.
+ * --------------------------------------------------------------------------*/
+@view-transition {
+  navigation: auto;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 320ms;
+  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* ----------------------------------------------------------------------------
+ * Mobile niceties
+ * --------------------------------------------------------------------------*/
+/* Hide the floating WhatsApp bubble on mobile when an application form is on
+   the page. The form has its own inline buttons. */
 @media (max-width: 767px) {
-  body:has(main [data-application-form]) [data-floating-wa] {
+  body:has(main [data-application-form]) [data-floating-wa],
+  body:has(main [data-application-form]) [data-mobile-cta] {
     display: none;
+  }
+  /* Reserve space at the bottom so the sticky CTA never covers the footer. */
+  body:has([data-mobile-cta]) {
+    padding-bottom: 76px;
   }
 }
